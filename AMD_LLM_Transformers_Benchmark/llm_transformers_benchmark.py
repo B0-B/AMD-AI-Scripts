@@ -19,7 +19,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from huggingface_hub import login
 
 # Load Parser
-parser = argparse.ArgumentParser(description="LLM Benchmark Script by Bogdan Bermel")
+parser = argparse.ArgumentParser(description="LLM Benchmark Script For Transformers Module")
 parser.add_argument("--hf_token", type=str, required=True, help="Hugging Face token")
 parser.add_argument("--model", type=str, required=True, help="Model huggingface path, e.g., inceptionai/jais-13b-chat")
 parser.add_argument("--iterations", type=int, default=10, help="How many test iterations to avg. over.")
