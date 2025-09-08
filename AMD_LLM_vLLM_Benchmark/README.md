@@ -20,7 +20,6 @@ A benchmark CLI tool to perform benchmarks on any `CasualLM` model loaded with [
 
 Run a benchmark with a single command line and tailor the benchmark to your needs.
 
-
 ```bash
 python3 llm_vllm_benchmark.py \
     --hf_token hf_xxxx \
