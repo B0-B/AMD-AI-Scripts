@@ -11,8 +11,6 @@
 #   --max_new_tokens 200 \
 #   --batch_size 1
 
-#!/usr/bin/env python3
-
 import time
 import argparse
 import torch
