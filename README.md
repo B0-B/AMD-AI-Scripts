@@ -1,4 +1,4 @@
-<p align="center"><img src="https://avatars.githubusercontent.com/u/141847198?v=4"></p>
+<p align="center"><img src="avatar.jfif"></p>
 
 # ROCm AI/ML Scripts
 

@@ -60,127 +60,140 @@ def main ():
 
     # Define prompt and generation length
     prompt_set = [
-        "Hello I'm a Language model,",
-        "The theory of quantum mechanics and",
-        "Have you ever considered",
-        "In the beginning, there was only silence.",
-        "Artificial intelligence is transforming",
-        "The cat jumped over the",
-        "Once upon a time in a distant galaxy,",
-        "The economic implications of inflation include",
-        "If I were invisible for a day, I would",
-        "The mitochondrion is known as",
-        "She opened the door and saw",
-        "The future of transportation involves",
-        "Climate change is primarily caused by",
-        "The best way to learn a new language is",
-        "He looked at the stars and wondered",
-        "The recipe calls for two cups of",
-        "In a world where robots rule,",
-        "The capital of France is",
-        "To solve the equation, we must first",
-        "The sound of rain on the window made me",
-        "The history of the Roman Empire begins with",
-        "If dogs could talk, they might say",
-        "The book was lying open on the table, revealing",
-        "Quantum entanglement suggests that",
-        "The best advice I ever received was",
-        "She typed the final line of code and",
-        "The sun dipped below the horizon as",
-        "The concept of time dilation arises from",
-        "He walked into the room and immediately noticed",
-        "The secret ingredient in the sauce is",
-        "The algorithm performs best when",
-        "The painting depicted a surreal landscape of",
-        "The last message from the spacecraft read",
-        "The moral of the story is",
-        "The experiment failed because",
-        "The stars aligned perfectly when",
-        "The robot paused and said",
-        "The universe is expanding because",
-        "The password was hidden inside",
-        "The professor explained that entropy is",
-        "The dragon flew over the mountains and",
-        "The email contained a mysterious link to",
-        "The detective found a clue under",
-        "The simulation showed that",
-        "The child asked why the sky is",
-        "The poet wrote about the beauty of",
-        "The astronaut looked out the window and saw",
-        "The machine learning model predicted",
-        "The philosopher argued that reality is",
-        "The haunted house was filled with",
-        "The code compiled successfully, but",
-        "The violinist played a melody that",
-        "The ancient scroll revealed a map to",
-        "The AI assistant responded with",
-        "The spaceship landed on a planet covered in",
-        "The theory of relativity implies that",
-        "The hacker bypassed the firewall using",
-        "The garden was overgrown with",
-        "The knight drew his sword and",
-        "The storm clouds gathered above",
-        "The teacher asked the students to",
-        "The robot's memory contained",
-        "The butterfly landed on",
-        "The quantum computer solved",
-        "The magician pulled a rabbit from",
-        "The scientist hypothesized that",
-        "The train arrived at the station and",
-        "The melody echoed through the",
-        "The AI model struggled with",
-        "The castle stood atop a hill surrounded by",
-        "The message was encoded using",
-        "The painter mixed shades of blue and",
-        "The spaceship accelerated toward",
-        "The detective suspected that",
-        "The forest was silent except for",
-        "The theory was disproven when",
-        "The dog barked at",
-        "The sun rose over the desert and",
-        "The algorithm failed to detect",
-        "The wizard cast a spell that",
-        "The stars twinkled above the",
-        "The robot's voice sounded like",
-        "The book described a world where",
-        "The chef prepared a dish with",
-        "The student asked a question about",
-        "The AI generated a story about",
-        "The door creaked open to reveal",
-        "The spaceship's engine hummed as",
-        "The code snippet included",
-        "The philosopher pondered the meaning of",
-        "The dragon's breath scorched",
-        "The simulation predicted a future where",
-        "The violin's strings vibrated with",
-        "The hacker used a vulnerability in",
-        "The stars formed a pattern resembling",
-        "The robot's sensors detected",
-        "The theory was supported by evidence from",
-        "The castle gates opened to reveal",
-        "The AI assistant suggested",
-        "The spacecraft entered orbit around",
-        "The algorithm optimized for",
-        "The poem ended with the line",
-        "The scientist discovered a new element called",
-        "The knight rode into battle with",
-        "The machine translated the text into",
-        "The story began with a whisper in the dark"
+        # Ultra-short (1–3 words)
+        "Suddenly",
+        "If only",
+        "Beyond reason",
+        "She knew",
+        "No one expected",
+        "Underneath",
+        "Before dawn",
+        "He remembered",
+        "Without warning",
+        "In silence",
+        "Almost there",
+        "Not yet",
+        "Too late",
+        "Just once",
+        "After everything",
+        "Until then",
+        "No turning back",
+        "For now",
+        "Still waiting",
+        "Almost forgotten",
+
+        # Short (4–8 words)
+        "The door creaked open and",
+        "She reached for the glowing orb",
+        "He never thought it would happen",
+        "In the shadows of the old cathedral",
+        "They whispered secrets into the wind",
+        "The algorithm began to rewrite itself",
+        "A single word changed everything",
+        "She opened the box and found",
+        "He stared at the screen as",
+        "The forest echoed with strange sounds",
+        "Rain fell harder than expected",
+        "She walked into the light and",
+        "He held the key tightly as",
+        "They stood at the edge of",
+        "The signal came from deep space",
+        "She turned the final page and",
+        "He stepped into the unknown with",
+        "The silence grew louder until",
+        "She touched the mirror and saw",
+        "He followed the trail of light",
+
+        # Medium (9–20 words)
+        "As the sun dipped below the horizon, the sky turned a shade no one had seen before",
+        "He walked into the room, unaware that everything was about to change forever",
+        "The scientist adjusted the lens, hoping the anomaly would reveal its true nature",
+        "She typed the final command and waited for the system to respond",
+        "In a world where memories can be traded, he found one that wasn’t his",
+        "The robot paused, calculating whether honesty was the optimal response",
+        "They gathered around the fire, each carrying a story too heavy to speak aloud",
+        "The child asked why stars sing, and the AI hesitated before answering",
+        "He opened the ancient scroll and began to decipher the forgotten language",
+        "The melody lingered in the air long after the last note was played",
+        "She stared at the horizon, wondering if the message had been received",
+        "He reached for the lever, knowing it would change everything",
+        "The stranger arrived just as the clock struck midnight",
+        "She placed the final piece into the puzzle and stepped back",
+        "They watched the comet streak across the sky in silence",
+        "He whispered the phrase again, hoping it would work this time",
+        "The machine hummed softly as it began to process the data",
+        "She walked through the portal and into a world she didn’t recognize",
+        "He found the photograph tucked inside the old book",
+        "The wind carried the scent of something unfamiliar and ancient",
+
+        # Long (21+ words)
+        "When the last satellite went dark, humanity had no choice but to look inward and confront the silence that followed",
+        "She had spent years building the machine, never expecting it to ask her why it had been created",
+        "In the archives beneath the city, they discovered a map that didn’t lead to treasure, but to something far more dangerous",
+        "The philosopher stood before the council and proposed a theory that would unravel centuries of accepted truth",
+        "He had always believed time was linear, until he met someone who remembered tomorrow more clearly than yesterday",
+        "The AI assistant hesitated before responding, as if the question had triggered something buried deep within its neural architecture",
+        "They had trained the model on every known language, yet it spoke in symbols no one could decode",
+        "As the spacecraft drifted past the event horizon, the crew began to experience memories that weren’t their own",
+        "She looked at the painting and realized it depicted a moment she hadn’t lived yet",
+        "The simulation was perfect—too perfect—and that’s when they realized they were no longer in control",
+        "He stood at the edge of the crater, staring into the swirling mist that seemed to whisper his name",
+        "She opened the encrypted file and found a message written in a language she had never seen before",
+        "The council had warned them not to interfere, but curiosity had already taken root in their minds",
+        "He traced the symbols on the wall, each one pulsing faintly with a rhythm that matched his heartbeat",
+        "The storm had passed, but the sky remained an unnatural shade of violet, casting eerie shadows across the landscape",
+        "She remembered the dream vividly, though she was certain she had never been to that place before",
+        "The machine responded with a question, one that no one in the room was prepared to answer",
+        "They followed the coordinates to a place that didn’t exist on any map, yet felt strangely familiar",
+        "He had written the code to protect them, but now it was evolving beyond anything he had imagined",
+        "The voice on the other end of the transmission spoke in riddles, each one more unsettling than the last"
     ]
+
 
     # Create a function to sample randomized prompt vectors
     def sample_prompt_vector ():
         return sample(prompt_set, args.batch_size)
 
     # Warmup
+    print('[INFO]: warming up ...')
     for _ in range(args.warmup_iterations):
         prompts = sample_prompt_vector()
         _ = llm.generate(prompts, sampling_params)
 
+    # After warmup, we need to measure the ttft to determine the tpot later
+    def measure_ttft ():
+        '''
+        Measures the mean ttft in seconds determined from a single token generation.
+        '''
+        ttfts = []
+        runs = 10
+        single_sampling_params = SamplingParams(
+            max_tokens=1,
+            temperature=0.7,
+            top_p=0.9
+        )
+        for _ in range(runs):
+            prompt_vector = sample_prompt_vector()
+            start   = time.perf_counter()
+            llm.generate(prompt_vector, single_sampling_params)
+            stop    = time.perf_counter()
+            # Perform time measurement
+            t       = stop - start # time in seconds
+            ttfts.append(t)
+        return sum(ttfts) / runs
+
     # Start actual benchmark
-    print('[Benchmark]: start ...')
+    print('[Benchmark]: start')
+
+    # Perform the ttft measurement
+    print('[Benchmark]: measure the TTFT ...')
+    ttft = measure_ttft()
+
+    # Throughput iterations
+    print('[Benchmark]: measuring throughput and latency ...')
     iteration_token_counts  = []
     iteration_times         = []
+    iteration_tpots         = []
     for iteration in range(args.iterations):
         print(f'[Progress]: {iteration}/{args.iterations}   ', end='\r')
         prompts = sample_prompt_vector()
@@ -201,6 +214,10 @@ def main ():
 
         iteration_token_counts.append(accumulated_token_count)
 
+        # Compute and denote the TPOT
+        tpot    = ( t - ttft ) / accumulated_token_count
+        iteration_tpots.append(tpot) 
+
     print('\n\n[Benchmark]: Finished.')
 
     # Metrics
@@ -213,6 +230,8 @@ def main ():
     tokens_per_request = tokens_total / requests_total
     throughput_token = tokens_total / latency_total
     throughput_request = requests_total / latency_total
+    # Compute the tpot in ms / token
+    tpot                  = 1000 * sum(iteration_tpots) / args.iterations
 
     # Console Output
     print('-------- Benchmark Details --------')
@@ -227,6 +246,8 @@ def main ():
     print("Latency per Batch (seconds):\t", round(latency_per_iteration, 3) )
     print("Latency per Request (s):\t", round(latency_per_request, 3) )
     print("Total Requests or Prompts:\t", requests_total)
+    print("Mean TTFT (seconds):\t", round(ttft, 3))
+    print("Mean TPOT (ms/token):\t", round(tpot, 3))
     print("Generated Tokens Total:\t", tokens_total)
     print("Generated Tokens per Iteration):\t", round(tokens_per_iteration, 3))
     print("Generated Tokens per Request):\t", round(tokens_per_request, 3))
