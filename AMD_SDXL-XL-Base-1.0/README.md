@@ -26,7 +26,19 @@ To start the container we recommend to create two directories on the host system
 1. A local huggingface directory via [huggingface-cli](https://huggingface.co/docs/huggingface_hub/en/guides/cli) to store large files like models, datasets etc. this will reduce loading and thus waiting times and keeps all files central without redundancy. It is assumed that the directory is located under ``/storage/huggingface`` - change to your needs
 2. A local project directory e.g. in your user home directory - here we use `~/sdxl-testing`.
 
-Both directories will be mounted into the container and be located at root level. Tthe first mount is to access large data and the second to exchange scripts for testing. Also, the mounted huggingface directory will be set as default in the container's environment variable i. e. `HF_HOME`, this will allow to synchronize model storage etc. and reduce redundant downloads in each container which is spun. All points are packaged in the following start command below
+copy the dockerfile into the project directory
+
+```bash
+cd ~/sdxl-testing && wget https://raw.githubusercontent.com/B0-B/AMD-AI-Scripts/refs/heads/main/AMD_SDXL-XL-Base-1.0/dockerfile
+```
+
+next build the container
+
+```bash
+docker build .
+```
+
+Both directories will be mounted during start into the container and be located at the root level. The first mount is to access large data and the second to exchange scripts for testing. Also, the mounted huggingface directory will be set as default in the container's environment variable i. e. `HF_HOME`, this will allow to synchronize model storage etc. and reduce redundant downloads in each container which is spun. All points are packaged in the following start command below
 
 ```bash
 docker run -it \
