@@ -249,8 +249,8 @@ def main ():
     print("Mean TTFT (seconds):\t", round(ttft, 3))
     print("Mean TPOT (ms/token):\t", round(tpot, 3))
     print("Generated Tokens Total:\t", tokens_total)
-    print("Generated Tokens per Iteration):\t", round(tokens_per_iteration, 3))
-    print("Generated Tokens per Request):\t", round(tokens_per_request, 3))
+    print("Generated Tokens per Iteration:\t", round(tokens_per_iteration, 3))
+    print("Generated Tokens per Request:\t", round(tokens_per_request, 3))
     print("Mean Token Throughput (tokens/s):\t", round(throughput_token, 3))
     print("Mean Request Throughput (requests/s): \t", round(throughput_request, 3))
 

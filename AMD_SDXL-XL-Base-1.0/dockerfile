@@ -1,0 +1,20 @@
+FROM rocm/pytorch-training:v25.8
+
+# Install system dependencies
+RUN apt update && apt install -y \
+    python3-pip \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install disffusers requirements
+RUN pip install diffusers transformers accelerate pandas torchvision webdataset img2dataset
+
+# Upgrade pip and install MLPerf tools globally
+RUN pip install --upgrade pip \
+    && pip install mlc-scripts mlcflow
+
+# Clone MLPerf automation repo (optional but recommended)
+RUN git clone --branch dev https://github.com/mlcommons/mlperf-automations.git /mlperf
+
+# Set working directory to the mounting directory
+WORKDIR /sdxl-testing 
