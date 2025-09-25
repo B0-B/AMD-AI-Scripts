@@ -10,7 +10,7 @@
 # ---------------------------------------------------------------------------------------------------
 #
 # ======== Benchmark Parameter ========
-model_id       = "stabilityai/stable-diffusion-xl-base-1.0"
+model_id       = "rocm/stable-diffusion-xl-base-1.0"
 device         = "cuda" # will work for AMD/ROCm
 image_px_size  = 512
 batch_size     = 1
