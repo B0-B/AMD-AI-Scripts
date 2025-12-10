@@ -5,39 +5,6 @@
 
 ---
 
-## Table of Contents
-
-- Overview
-- Quick Start
-- Installation & Requirements
-- Concepts
-  - GEMM Anatomy
-  - Data Types & Precision Strings
-  - Transpose & Leading Dimensions
-  - Epilogue: Bias & Activation
-- Module Layout
-- Class Reference
-  - `hipBlasLt.__init__(gpuName="")`
-  - `specifyMatrix(matrixName, rows, cols, precision, transpose=False, bfloat=False)`
-  - `addBias(precision, bfloat=False, source='d')`
-  - `setActivation(activationFunction)`
-  - `specifyScalars(alpha, beta)`
-  - `setComputePrecision(precision)`
-  - `convertPrecision(precision, bfloat=False)`
-  - `run(batchSize=1, validate=False, warmupIterations=0)`
-  - `showResults(*metrics)`
-- Usage Examples
-  - 1) Minimal FP32 GEMM
-  - 2) Mixed Precision (A=f32, B=f16) with FP32 compute
-  - 3) Bias and Activation
-  - 4) BFloat16 (BF16) and Batch GEMM
-  - 5) INT8 GEMM (experimental)
-- Result Parsing & Display
-- Troubleshooting
-- Best Practices
-
----
-
 ## Overview
 
 `hipBlasLt` is a convenience class that:
@@ -76,3 +43,4 @@ No external Python packages are required; the wrapper uses the standard library 
 Note: The class shells out to hipblaslt-bench. Ensure the binary matches your ROCm/HIP stack and that Tensile kernels for your gfx target are present.
 
 
+## Usage Examples
