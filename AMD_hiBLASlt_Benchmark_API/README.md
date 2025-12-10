@@ -1,6 +1,3 @@
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/x-mathjax-config"> MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });</script>
-
 # `hipBlasLt` Python API — Full Documentation
 
 > A thin, ergonomic wrapper around the `hipblaslt-bench` client for building and running GEMM (matrix multiply) benchmarks on AMD ROCm using **hipBLASLt**.
