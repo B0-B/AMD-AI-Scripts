@@ -17,6 +17,7 @@
 
 It’s designed to help you quickly iterate on matrix sizes, mixed precision, and epilogue settings—without hand‑crafting command lines and parsing text by hand.
 
+$$D = $$
 ---
 
 ## Quick Start
