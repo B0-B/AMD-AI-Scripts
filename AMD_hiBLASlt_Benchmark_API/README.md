@@ -7,17 +7,24 @@
 
 ## Overview
 
-`hipBlasLt` is a convenience class that:
+AMD's [hipBLASlt](https://rocm.docs.amd.com/projects/hipBLASLt/en/latest/index.html) is a toolbox within the ROCm software suite for steering and performing linear algebra calculations, mainly centered around matrix-matrix calculus on AMD GPUs. According to the AMD authors, it has a flexible API that extends functionalities beyond a traditional BLAS library, such as adding flexibility to matrix data layouts, input types, compute types, and algorithmic implementations and heuristics. 
 
-- Builds **reproducible** `hipblaslt-bench` command lines for GEMM runs.
-- Handles **precision strings** (e.g., `f16_r`, `bf16_r`, `f32_r`, `i8_r`) for A/B/C/D and compute type.
-- Manages **transpose flags** and **leading dimensions** (as currently implemented: defaults to non-transposed leading dimensions).
-- Supports **bias** epilogue and **activation** selection.
-- Runs the benchmark and **parses output** to display selected metrics.
+In order to operate some of the most popular workloads today it is necessary to understand what they have in common. Most scientific fields, HPC, rendering, and especially AI workloads rely on fundamental tensor calculus, mathematical operations which can be accelerated through parallelization. The most abstract formula which can reproduce all commonly known algorithms can be expressed as
 
-It’s designed to help you quickly iterate on matrix sizes, mixed precision, and epilogue settings—without hand‑crafting command lines and parsing text by hand.
+$$D=Activation(α⋅op(A)⋅op(B)+β⋅op(C)+bias) \,\,[1]$$
 
-$$D = $$
+In the following we will explore every parameter in detail. The equation can be disambled into the terms
+
+- Activation, which a free to choose non-linear activation function, applied to each dimension of the argument vector
+- $op()$ is a tensor operation for transposition
+- $\alpha \cdot op(A)\cdot op(B)$ which is a pure GEMM calculation
+- $\beta\cdot op(C)$ which is a linear feedback term by incoorporating information from another or previous state, can also be understood as momentum
+- $bias$ is a constant bias tensor, something like a systematic deviation or a neuron bias. The greater the bias the smaller the exploration and ability to learn or adapt.
+
+and the variables are 
+
+- $\alpha, \beta$ are scalar factors which operate on their corr. matrix or tensor
+- $A, B$ are tensors whose size is known as problem sizes: $m$ <int>: rows of $C$ (and $A$), $n$ <int>: cols of $C$ (and $B$), $k$ <int>: cols of $A$ / rows of $B$.
 ---
 
 ## Quick Start
@@ -135,6 +142,14 @@ hipblaslt-Gflops    hipblaslt-GB/s      us                  CPU-Gflops          
 
 ### Class Reference
 
+`hipBlasLt` is a convenience class that:
+
+- Builds **reproducible** `hipblaslt-bench` command lines for GEMM runs.
+- Handles **precision strings** (e.g., `f16_r`, `bf16_r`, `f32_r`, `i8_r`) for A/B/C/D and compute type.
+- Manages **transpose flags** and **leading dimensions** (as currently implemented: defaults to non-transposed leading dimensions).
+- Supports **bias** epilogue and **activation** selection.
+- Runs the benchmark and **parses output** to display selected metrics.
+  
 ### ``hipBlasLt.__init__(gpuName="")``
 
 
