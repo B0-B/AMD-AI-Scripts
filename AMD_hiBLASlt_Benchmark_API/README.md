@@ -311,3 +311,20 @@ The current implementation:
 - Prints a run info block (GPU, dims, precisions, transpose flags, etc.).
 
 **Note:** If your bench output format differs, you may need to adjust the parser.
+
+---
+
+### ``getResultData(self, *metrics) -> dict[str, str | float | int]``
+
+Collects selected benchmark metrics from the stored self.results string (produced by a hipblaslt-bench run) and returns the raw values (with floats and integers evaluated) in a dictionary.
+
+#### Purpose
+getResultData parses the tail of the hipblaslt-bench output to extract a subset of metrics you care about (e.g., hipblaslt-Gflops, hipblaslt-GB/s, us) and returns a mapping from metric name to value for easy programmatic consumption.
+
+#### Parameters
+
+- *metrics: A variable-length list of metric names (strings) to include in the result.
+
+#### Returns
+
+- A dictionary where keys are metric names and values are the parsed values (as strings; you can cast to numbers later).
