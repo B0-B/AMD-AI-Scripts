@@ -16,7 +16,7 @@ def exec (shell_command: str) -> str:
         check=True,
         shell=True)
     if result.stderr:
-        return result.stderr
+        return result.stdout + '\n' + result.stderr
     return result.stdout
 
 class hipBlasLt:
@@ -77,21 +77,25 @@ class hipBlasLt:
         # Convert to upper casing
         matrixName = matrixName.upper()
 
-        # Sanity checks
-        if matrixName not in self.matrixDimensions.keys():
-            raise KeyError(f'No matrix named "{matrixName}", please use the letters A, B or C')
+        # Format the precision parameter, and add bfloat type if selected
         if precision not in self.supportedPrecisions:
             raise ValueError(f'Precision "{precision}" is not supported, please choose a precision from {self.supportedPrecisions}.')
+        precision = self.convertPrecision(precision)
+        self.matrixPrecision[matrixName] = precision
+
+        # Continue only for A and B matrices as all others will automatically build
+        if matrixName not in 'AB':
+            return
+
+        # Sanity checks
+        if matrixName not in self.matrixDimensions.keys():
+            raise KeyError(f'No matrix named "{matrixName}", please use the letters A, B')
         if matrixName == 'B' and self.matrixDimensions['A'][1] != 0 and rows != self.matrixDimensions['A'][1]:
             raise ValueError(f'The row dimension of matrix B (k, n) must equal the col dimensions of matrix A (m, k)!')
         elif matrixName == 'A' and self.matrixDimensions['B'][0] != 0 and cols != self.matrixDimensions['B'][0]:
             raise ValueError(f'The col dimension of matrix A (m, k) must equal the row dimensions of matrix B (k, n)!')
 
-        # Format the precision parameter, and add bfloat type if selected
-        precision = self.convertPrecision(precision)
-
         self.matrixDimensions[matrixName] = (rows, cols)
-        self.matrixPrecision[matrixName] = precision
         self.transpose[matrixName] = transpose
     
     def addBias (self, precision: int, bfloat: bool=False, source: str='d'):
@@ -130,17 +134,20 @@ class hipBlasLt:
         self.alpha = alpha
         self.beta  = beta
 
-    def setComputePrecision (self, precision: int) -> None:
+    def setComputePrecision (self, precision: str|int) -> None:
 
         '''
         Sets the general compute precision - important in mixed precision.
         
         :param self: Description
-        :param precision: Description
-        :type precision: int
+        :param precision: The current precision string s,f32_r,x,xf32_r,f64_r,i32_r,f32_bf16_r or integer 32, 64.
+        :type precision: str
         '''
 
-        self.computePrecision = self.convertPrecision(precision)
+        if isinstance(precision, int):
+            self.computePrecision = self.convertPrecision(precision)
+        else:
+            self.computePrecision = precision
 
     def convertPrecision (self, precision: int, bfloat: bool=False) -> str:
         '''
@@ -224,9 +231,9 @@ class hipBlasLt:
         '''
 
         # Remove whitespaces
-        self.results = ''.join(self.results.split(' '))
+        results = ''.join(self.results.split(' '))
         # Split data in keys and values
-        keys, values = self.results.split('\n')
+        keys, values = results.split('\n')
         keys = keys.split(':')[1]
         keys = keys.split(',')
         values = values.split(',')
@@ -253,14 +260,90 @@ class hipBlasLt:
                 row += values[i] + ' ' * padLength
 
         print('-'*8 + 'Benchmark results' + '-'*8 + '\n' + info + header + '\n' + row)
-        
+    
+    def getResultData (self, *metrics: str) -> dict[str, str|float|int]:
+
+        # Remove whitespaces
+        results = ''.join(self.results.split(' '))
+        # Split data in keys and values
+        keys, values = results.split('\n')
+        keys = keys.split(':')[1]
+        keys = keys.split(',')
+        values = values.split(',')
+        data = {}
+
+        # Aggregate metrics
+        for i in range(len(keys)):
+            key = keys[i]
+            if key in metrics:
+                val = values[i]
+                try:
+                    data[key] = float(val)
+                except:
+                    data[key] = val
+
+        return data
+
+def simpleGemmBenchmark (gpuName: str='', activation: str='relu'):
+
+    '''
+    A simple GEMM benchmark.
+    
+    :param gpuName: Description
+    :type gpuName: str
+    :param activation: Description
+    :type activation: str
+    '''
+
+
+    sizes = [128, 256, 512, 1024, 2048, 4096, 8192]
+    precisions = [16, 32]
+    metrics = ['batch_count', 'hipblaslt-Gflops', 'hipblaslt-GB/s', 'us', 'CPU-Gflops', 'CPU-us']
+
+    data = []
+    for precision in precisions:
+        for dim in sizes:
+            # Perform benchmark
+            # Initialize a fresh hipBlasLt object
+            bench = hipBlasLt(gpuName)
+            bench.specifyMatrix('A', dim, dim, precision)
+            bench.specifyMatrix('B', dim, dim, precision)
+            bench.specifyMatrix('C', dim, dim, precision)
+            bench.specifyMatrix('D', dim, dim, precision)
+            bench.setComputePrecision(32)
+            bench.specifyScalars(1.0, 1.0)
+            bench.setActivation(activation)
+            bench.run(1, True)
+            # Denote data row
+            dataRow = [precision, dim, activation] + list(bench.getResultData(*metrics).values())
+            data.append(dataRow)
+
+    # Create table
+    header = ''
+    row = ''
+    cellSize = 20
+    # Create table header
+    keys = ['precision', 'tensor_size', 'activation'] + metrics
+    for i in range(len(keys)): # header
+        key = keys[i]
+        padLength = cellSize - len(key) if len(key) <= cellSize else 0
+        header += key + ' ' * padLength
+    print(header)
+    # Create table rows
+    for row in data: # data rows
+        line = ''
+        for i in range(len(keys)):
+            val = row[i]
+            padLength = cellSize - len(str(val)) if len(str(val)) <= cellSize else 0
+            line += str(val) + ' ' * padLength
+        print(line)
+
 if __name__ == '__main__':
 
     # example usage
     hipblt = hipBlasLt('AMD Instinct MI300X')
     hipblt.specifyMatrix('A', 128, 128, 32)
     hipblt.specifyMatrix('B', 128, 128, 32)
-    #hipblt.addBias(32)
     hipblt.setComputePrecision(32)
     hipblt.specifyScalars(1.0, 1.0)
     hipblt.run(batchSize=1, validate=True)
