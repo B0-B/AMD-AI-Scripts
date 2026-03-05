@@ -22,8 +22,8 @@ from torch.utils.data import DataLoader
 from quark.torch import ModelQuantizer
 from quark.torch.export.api import SafetensorsExporter
 from quark.torch.export import ExporterConfig, JsonExporterConfig
-from quark.torch.quantization.config.config import QuantizationConfig
-from quark.torch.quantization import (config, FP8E4M3PerTensorSpec)
+from quark.torch.quantization.config.config import QuantizationConfig, Config
+from quark.torch.quantization import FP8E4M3PerTensorSpec
 
 
 
@@ -57,7 +57,7 @@ kv_cache_quant_config = {name : QuantizationConfig(input_tensors=global_quant_co
 layer_quant_config = kv_cache_quant_config.copy()
 # Create quantization config
 EXCLUDE_LAYERS = ["lm_head"]
-quant_config = config(
+quant_config = Config(
     global_quant_config=global_quant_config,
     layer_quant_config=layer_quant_config,
     kv_cache_quant_config=kv_cache_quant_config,
