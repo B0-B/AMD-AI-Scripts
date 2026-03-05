@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # A simple demonstration of LLM quantization with Quark tool on AMD CDNA GPUs.
+# The script will
 # Copyright (C), 2026 by AMD authors.
 
 # =============== Parameters =================
 MODEL_ID = "Qwen/Qwen3-4B-Instruct-2507"
+OUTPUT_DIR = "./"
 MAX_SEQ_LEN = 512
 BATCH_SIZE = 1
 NUM_CALIBRATION_DATA = 512
@@ -11,7 +13,7 @@ NUM_CALIBRATION_DATA = 512
 
 # Import modules
 from pathlib import Path
-currentDir = Path(__file__).resolve().parent
+# currentDir = Path(__file__).resolve().parent
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -70,13 +72,19 @@ quant_model = quantizer.quantize_model(model, calib_dataloader)
 # Freeze quantized model to export.
 freezed_model = quantizer.freeze(model)
 # Define export config.
-LLAMA_KV_CACHE_GROUP = ["*k_proj", "*v_proj"]
-export_config = ExporterConfig(json_export_config=JsonExporterConfig())
-export_config.json_export_config.kv_cache_group = LLAMA_KV_CACHE_GROUP
+# LLAMA_KV_CACHE_GROUP = ["*k_proj", "*v_proj"]
+# export_config = ExporterConfig(json_export_config=JsonExporterConfig())
+# export_config.json_export_config.kv_cache_group = LLAMA_KV_CACHE_GROUP
 
-
+# 5.) Export the quantized safetensors
 EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
-EXPORT_DIR = currentDir.joinpath(EXPORT_SUBDIR)
-exporter = SafetensorsExporter(model=model, output_dir=EXPORT_DIR)
+EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
+exporter = SafetensorsExporter(
+    model=model,
+    export_dir=str(EXPORT_DIR),
+    custom_mode="vllm",            # Optimized for vLLM-Inference
+    weight_format="fp8",           # Save weights in FP8
+    pack_method="float8"           # Packing standard for ROCm/vLLM
+)
 with torch.no_grad():
-    exporter._export(freezed_model, quant_config=quant_config, tokenizer=tokenizer)
+    exporter._export(quant_config=quant_config, tokenizer=tokenizer)
