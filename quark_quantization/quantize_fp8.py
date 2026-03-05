@@ -1,21 +1,30 @@
 #!/usr/bin/env python3
 # A simple demonstration of LLM quantization with Quark tool on AMD CDNA GPUs.
+
+# =============== Parameters =================
+MODEL_ID = "Qwen/Qwen3-4B-Instruct-2507"
+MAX_SEQ_LEN = 512
+BATCH_SIZE = 1
+NUM_CALIBRATION_DATA = 512
+# ============================================
+
+
+from pathlib import Path
+currentDir = Path(__file__).resolve().parent
+
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
 from datasets import load_dataset
 from torch.utils.data import DataLoader
 
-from quark.torch import ModelQuantizer, ModelExporter
+from quark.torch import ModelQuantizer
+from quark.torch.export.api import SafetensorsExporter
 from quark.torch.export import ExporterConfig, JsonExporterConfig
 from quark.torch.quantization import (Config, QuantizationConfig,
                                      FP8E4M3PerTensorSpec)
 
-# Parameters
-MODEL_ID = "Qwen/Qwen3-4B-Instruct-2507"
-MAX_SEQ_LEN = 512
-BATCH_SIZE = 1
-NUM_CALIBRATION_DATA = 512
+
 
 # 1.) First, load the pre-trained model and its corresponding tokenizer using the Hugging Face transformers library.
 model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto", torch_dtype="auto")
@@ -63,8 +72,10 @@ freezed_model = quantizer.freeze(model)
 LLAMA_KV_CACHE_GROUP = ["*k_proj", "*v_proj"]
 export_config = ExporterConfig(json_export_config=JsonExporterConfig())
 export_config.json_export_config.kv_cache_group = LLAMA_KV_CACHE_GROUP
-EXPORT_DIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
-exporter = ModelExporter(config=export_config, export_dir=EXPORT_DIR)
+
+
+EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
+EXPORT_DIR = currentDir.joinpath(EXPORT_SUBDIR)
+exporter = SafetensorsExporter(model=model, output_dir=EXPORT_DIR)
 with torch.no_grad():
-    exporter.export_safetensors_model(freezed_model,
-        quant_config=quant_config, tokenizer=tokenizer)
+    exporter._export(freezed_model, quant_config=quant_config, tokenizer=tokenizer)
