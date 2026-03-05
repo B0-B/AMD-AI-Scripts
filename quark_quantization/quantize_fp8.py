@@ -91,7 +91,7 @@ with torch.no_grad():
     export_safetensors(
         model,
         output_dir=EXPORT_DIR,
-        custom_mode="vllm",
+        custom_mode="fp8",
         weight_format="real_quantized",
         pack_method="order"
     )
