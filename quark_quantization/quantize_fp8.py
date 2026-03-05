@@ -28,7 +28,7 @@ from quark.torch.quantization import FP8E4M3PerTensorSpec
 
 
 # 1.) First, load the pre-trained model and its corresponding tokenizer using the Hugging Face transformers library.
-model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto", torch_dtype="auto")
+model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto", dtype="auto")
 model.eval()
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, model_max_length=MAX_SEQ_LEN)
 tokenizer.pad_token = tokenizer.eos_token
