@@ -13,7 +13,6 @@ NUM_CALIBRATION_DATA = 512
 
 # Import modules
 from pathlib import Path
-# currentDir = Path(__file__).resolve().parent
 
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
@@ -26,7 +25,6 @@ from quark.torch.export.api import SafetensorsExporter
 from quark.torch.export import ExporterConfig, JsonExporterConfig
 from quark.torch.quantization.config.config import QuantizationConfig, Config
 from quark.torch.quantization import FP8E4M3PerTensorSpec
-
 
 
 # 1.) First, load the pre-trained model and its corresponding tokenizer using the Hugging Face transformers library.
@@ -71,17 +69,13 @@ quantizer = ModelQuantizer(quant_config)
 quant_model = quantizer.quantize_model(model, calib_dataloader)
 # Freeze quantized model to export.
 freezed_model = quantizer.freeze(model)
-# Define export config.
-# LLAMA_KV_CACHE_GROUP = ["*k_proj", "*v_proj"]
-# export_config = ExporterConfig(json_export_config=JsonExporterConfig())
-# export_config.json_export_config.kv_cache_group = LLAMA_KV_CACHE_GROUP
 
 # 5.) Export the quantized safetensors
 EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
 EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
 exporter = SafetensorsExporter(
     model=model,
-    export_dir=str(EXPORT_DIR),
+    output_dir=str(EXPORT_DIR),
     custom_mode="vllm",            # Optimized for vLLM-Inference
     weight_format="fp8",           # Save weights in FP8
     pack_method="float8"           # Packing standard for ROCm/vLLM
