@@ -22,6 +22,7 @@ from torch.utils.data import DataLoader
 
 
 from quark.torch import ModelQuantizer
+from quark.torch.export.safetensors import export_hf_model
 from quark.torch.export.api import SafetensorsExporter, export_safetensors
 from quark.torch.export import ExporterConfig, JsonExporterConfig
 from quark.torch.quantization.config.config import QuantizationConfig, Config
@@ -74,19 +75,21 @@ freezed_model = quantizer.freeze(model)
 # 5.) Export the quantized safetensors
 EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
 EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
-# ----> Buggy throwing a NotImplementedError:
-exporter = SafetensorsExporter(
-    model=freezed_model,
-    output_dir=EXPORT_DIR,
-    custom_mode="vllm",                 # Optimized for vLLM-Inference
-    weight_format="real_quantized",     # Save weights in FP8
-    pack_method="order"                 # float8 packing standard for ROCm/vLLM
-)
-with torch.no_grad():
-    # exporter._export(quant_config=quant_config, tokenizer=tokenizer)
-    exporter._export_impl()
 
-# Option B:
+# Option A:
+# ----> Buggy throwing a NotImplementedError:
+# exporter = SafetensorsExporter(
+#     model=freezed_model,
+#     output_dir=EXPORT_DIR,
+#     custom_mode="vllm",                 # Optimized for vLLM-Inference
+#     weight_format="real_quantized",     # Save weights in FP8
+#     pack_method="order"                 # float8 packing standard for ROCm/vLLM
+# )
+# with torch.no_grad():
+#     # exporter._export(quant_config=quant_config, tokenizer=tokenizer)
+#     exporter._export_impl()
+
+# Option B ---> same route, same error:
 # with torch.no_grad():
 #     # Diese Funktion ist der empfohlene Weg, wenn die Exporter-Klassen 
 #     # intern noch nicht fertig implementiert sind.
@@ -97,3 +100,8 @@ with torch.no_grad():
 #         weight_format="real_quantized",
 #         pack_method="order"
 #     )
+
+
+# Option C:
+with torch.no_grad():
+    export_hf_model(freezed_model, EXPORT_DIR, tokenizer)
