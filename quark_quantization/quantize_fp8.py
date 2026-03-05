@@ -75,24 +75,24 @@ freezed_model = quantizer.freeze(model)
 EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
 EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
 # ----> Buggy throwing a NotImplementedError:
-exporter = SafetensorsExporter(
-    model=freezed_model,
-    output_dir=EXPORT_DIR,
-    custom_mode="vllm",                 # Optimized for vLLM-Inference
-    weight_format="real_quantized",     # Save weights in FP8
-    pack_method="order"                 # float8 packing standard for ROCm/vLLM
-)
-with torch.no_grad():
-    exporter._export(quant_config=quant_config, tokenizer=tokenizer)
+# exporter = SafetensorsExporter(
+#     model=freezed_model,
+#     output_dir=EXPORT_DIR,
+#     custom_mode="vllm",                 # Optimized for vLLM-Inference
+#     weight_format="real_quantized",     # Save weights in FP8
+#     pack_method="order"                 # float8 packing standard for ROCm/vLLM
+# )
+# with torch.no_grad():
+#     exporter._export(quant_config=quant_config, tokenizer=tokenizer)
 
 # Option B:
-# with torch.no_grad():
-#     # Diese Funktion ist der empfohlene Weg, wenn die Exporter-Klassen 
-#     # intern noch nicht fertig implementiert sind.
-#     export_safetensors(
-#         freezed_model,
-#         output_dir=EXPORT_DIR,
-#         custom_mode="fp8",
-#         weight_format="real_quantized",
-#         pack_method="order"
-#     )
+with torch.no_grad():
+    # Diese Funktion ist der empfohlene Weg, wenn die Exporter-Klassen 
+    # intern noch nicht fertig implementiert sind.
+    export_safetensors(
+        freezed_model,
+        output_dir=EXPORT_DIR,
+        custom_mode="fp8",
+        weight_format="real_quantized",
+        pack_method="order"
+    )
