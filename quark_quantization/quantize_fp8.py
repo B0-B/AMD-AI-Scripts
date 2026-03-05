@@ -91,8 +91,6 @@ EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
 
 # Option B ---> same route, same error:
 # with torch.no_grad():
-#     # Diese Funktion ist der empfohlene Weg, wenn die Exporter-Klassen 
-#     # intern noch nicht fertig implementiert sind.
 #     export_safetensors(
 #         freezed_model,
 #         output_dir=EXPORT_DIR,
