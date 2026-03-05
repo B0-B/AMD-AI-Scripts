@@ -76,9 +76,9 @@ EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
 exporter = SafetensorsExporter(
     model=model,
     output_dir=EXPORT_DIR,
-    custom_mode="vllm",            # Optimized for vLLM-Inference
-    weight_format="fp8",           # Save weights in FP8
-    pack_method="float8"           # Packing standard for ROCm/vLLM
+    custom_mode="vllm",                 # Optimized for vLLM-Inference
+    weight_format="real_quantized",     # Save weights in FP8
+    pack_method="float8"                # Packing standard for ROCm/vLLM
 )
 with torch.no_grad():
     exporter._export(quant_config=quant_config, tokenizer=tokenizer)
