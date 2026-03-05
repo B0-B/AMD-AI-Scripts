@@ -76,7 +76,7 @@ EXPORT_SUBDIR = MODEL_ID.split("/")[1] + "-w-fp8-a-fp8-kvcache-fp8-pertensor"
 EXPORT_DIR = Path(OUTPUT_DIR).joinpath(EXPORT_SUBDIR)
 # ----> Buggy throwing a NotImplementedError:
 exporter = SafetensorsExporter(
-    model=model,
+    model=freezed_model,
     output_dir=EXPORT_DIR,
     custom_mode="vllm",                 # Optimized for vLLM-Inference
     weight_format="real_quantized",     # Save weights in FP8
