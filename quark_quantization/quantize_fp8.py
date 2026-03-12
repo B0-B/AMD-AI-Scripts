@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # A simple demonstration of LLM quantization with Quark tool on AMD CDNA GPUs.
-# The script will
+# The script will accept model and quantization parameters and accordingly quantize
+# the provided model weights to fp8 precision. Finally the weights will be exported
+# as safe tensors in the provided output directory. This export format is compatible
+# with vLLM. 
 # Copyright (C), 2026 by AMD authors.
 
 # =============== Parameters =================
