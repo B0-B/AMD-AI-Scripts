@@ -14,7 +14,7 @@
 import time
 import argparse
 import torch
-from random import sample
+from random import sample, randint
 from huggingface_hub import login
 from vllm import LLM, SamplingParams
 from transformers import AutoTokenizer

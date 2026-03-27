@@ -27,7 +27,7 @@ def stdDev (values: list[float], mean: float|None=None) -> float:
 # =============== Base Bench Object =================
 class BaseBench:
 
-    def __init__(self, hf_model: str, hf_token: str|None=None):
+    def __init__(self, hf_model: str, hf_token: str|None=None, device_type: str="GPU"):
         
         self.location = Path(__file__).resolve().parent
 
@@ -38,6 +38,7 @@ class BaseBench:
 
         self.llm = LLM(
             model=hf_model,
+            device=device_type.lower(),
             tokenizer=hf_model,
             trust_remote_code=True,
             tokenizer_mode="auto",
@@ -291,7 +292,7 @@ def integratedBenchmark (device_type: str="GPU",
 
     for model in hf_models:
 
-        bench = BaseBench(model, hf_token=hf_token)
+        bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
 
         # Load the dataset
         bench.loadDataset(dataset_type)
