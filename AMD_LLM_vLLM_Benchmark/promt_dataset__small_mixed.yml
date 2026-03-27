@@ -1,0 +1,147 @@
+# A short mixed dataset with varying prompt length
+prompts:
+
+  # Ultra-short (1–3 words)
+  - Suddenly,
+  - If only,
+  - Beyond reason,
+  - She knew,
+  - No one expected,
+  - Underneath,
+  - Before dawn,
+  - He remembered,
+  - Without warning,
+  - In silence,
+  - Almost there,
+  - Not yet,
+  - Too late,
+  - Just once,
+  - After everything,
+  - Until then,
+  - No turning back,
+  - For now,
+  - Still waiting,
+  - Almost forgotten,
+
+  # Short (4–8 words)
+  - The door creaked open and,
+  - She reached for the glowing orb,
+  - He never thought it would happen,
+  - In the shadows of the old cathedral,
+  - They whispered secrets into the wind,
+  - The algorithm began to rewrite itself,
+  - A single word changed everything,
+  - She opened the box and found,
+  - He stared at the screen as,
+  - The forest echoed with strange sounds,
+  - Rain fell harder than expected,
+  - She walked into the light and,
+  - He held the key tightly as,
+  - They stood at the edge of,
+  - The signal came from deep space,
+  - She turned the final page and,
+  - He stepped into the unknown with,
+  - The silence grew louder until,
+  - She touched the mirror and saw,
+  - He followed the trail of light,
+
+  # Medium (9–20 words)
+  - As the sun dipped below the horizon, the sky turned a shade no one had seen before,
+  - He walked into the room, unaware that everything was about to change forever,
+  - The scientist adjusted the lens, hoping the anomaly would reveal its true nature,
+  - She typed the final command and waited for the system to respond,
+  - In a world where memories can be traded, he found one that wasn’t his,
+  - The robot paused, calculating whether honesty was the optimal response,
+  - They gathered around the fire, each carrying a story too heavy to speak aloud,
+  - The child asked why stars sing, and the AI hesitated before answering,
+  - He opened the ancient scroll and began to decipher the forgotten language,
+  - The melody lingered in the air long after the last note was played,
+  - She stared at the horizon, wondering if the message had been received,
+  - He reached for the lever, knowing it would change everything,
+  - The stranger arrived just as the clock struck midnight,
+  - She placed the final piece into the puzzle and stepped back,
+  - They watched the comet streak across the sky in silence,
+  - He whispered the phrase again, hoping it would work this time,
+  - The machine hummed softly as it began to process the data,
+  - She walked through the portal and into a world she didn’t recognize,
+  - He found the photograph tucked inside the old book,
+  - The wind carried the scent of something unfamiliar and ancient,
+
+  # Long (21+ words)
+  - When the last satellite went dark, humanity had no choice but to look inward and confront the silence that followed,
+  - She had spent years building the machine, never expecting it to ask her why it had been created,
+  - In the archives beneath the city, they discovered a map that didn’t lead to treasure, but to something far more dangerous,
+  - The philosopher stood before the council and proposed a theory that would unravel centuries of accepted truth,
+  - He had always believed time was linear, until he met someone who remembered tomorrow more clearly than yesterday,
+  - The AI assistant hesitated before responding, as if the question had triggered something buried deep within its neural architecture,
+  - They had trained the model on every known language, yet it spoke in symbols no one could decode,
+  - As the spacecraft drifted past the event horizon, the crew began to experience memories that weren’t their own,
+  - She looked at the painting and realized it depicted a moment she hadn’t lived yet,
+  - The simulation was perfect—too perfect—and that’s when they realized they were no longer in control,
+  - He stood at the edge of the crater, staring into the swirling mist that seemed to whisper his name,
+  - She opened the encrypted file and found a message written in a language she had never seen before,
+  - The council had warned them not to interfere, but curiosity had already taken root in their minds,
+  - He traced the symbols on the wall, each one pulsing faintly with a rhythm that matched his heartbeat,
+  - The storm had passed, but the sky remained an unnatural shade of violet, casting eerie shadows across the landscape,
+  - She remembered the dream vividly, though she was certain she had never been to that place before,
+  - The machine responded with a question, one that no one in the room was prepared to answer,
+  - They followed the coordinates to a place that didn’t exist on any map, yet felt strangely familiar,
+  - He had written the code to protect them, but now it was evolving beyond anything he had imagined,
+  - The voice on the other end of the transmission spoke in riddles, each one more unsettling than the last
+
+  # ~ 128 Tokens
+  - |
+    This is prompt one. To reach 128 tokens, you need about one hundred words of text. 
+    You can fill this area with your specific instructions, context, or technical 
+    documentation. vLLM will process this entire block as a single input sequence. 
+    Make sure to use the pipe symbol if you have multiple paragraphs or code snippets 
+    within a single list item. This ensures all spacing and newlines are preserved 
+    exactly as written, which is crucial for maintaining the structure of your 
+    data when the server parses it for benchmarking.
+  - |
+    This is prompt two. It follows the same rule of being a long-form text block.
+    If you are using the "random" dataset feature in vLLM, it generates these tokens
+    automatically. However, by putting them in this YAML list, you are creating a
+    "fixed" dataset where the content remains identical across multiple test runs.
+    This is much better for comparing the latency of different GPU configurations 
+    or quantization methods, as the input remains a constant variable while you
+    tweak your server settings to find the highest possible throughput.
+  - |
+    This is prompt three. When creating these, remember that special characters like 
+    emojis, complex punctuation, and long technical terms often count as multiple 
+    tokens. If your goal is a strict stress test, try to include a variety of 
+    characters. A simple paragraph of 100 words is usually enough to hit the 
+    128-token mark. Keep an eye on your tokenizer's specific behavior, as a Llama 
+    tokenizer might count this text differently than a GPT or Mistral tokenizer 
+    would, though the difference is usually minor for standard English prose.
+  - |
+    Explain the evolution of large language models from early recurrent neural networks to the 
+    modern transformer architecture used in GPT-4 and Llama 3. Focus on how the self-attention 
+    mechanism allowed for better parallelization during training and how this led to the massive 
+    scaling we see today. Describe why the industry moved away from LSTM and GRU models in 
+    favor of the encoder-decoder and decoder-only designs that currently dominate the field 
+    of natural intelligence and machine learning research worldwide for high-performance apps.
+  - |
+    Write a comprehensive guide on how to optimize a high-traffic web application using a 
+    combination of edge computing and localized database caching strategies. Your response 
+    should include specific examples of using Redis for session management and how to 
+    implement a Content Delivery Network like Cloudflare to reduce latency for global users. 
+    Explain the trade-offs between strong consistency and eventual consistency in a 
+    distributed system and provide a sample architecture diagram description that ensures 
+    high availability and disaster recovery across multiple regions easily.
+  - |
+    Describe the process of brewing a professional-grade espresso at home, starting from the 
+    selection of high-altitude Arabica beans to the final extraction process. Detail the 
+    importance of grind size consistency using a high-quality burr grinder and how water 
+    temperature affects the acidity and body of the shot. Explain the chemistry of milk 
+    steaming, specifically focusing on the creation of micro-foam for latte art. Provide 
+    a troubleshooting section for common issues like channeling or over-extraction that 
+    can ruin the flavor profile of a double shot of espresso for any home barista today.
+  - |
+    Discuss the impact of the Industrial Revolution on urban development and the rise of 
+    the modern middle class during the nineteenth century in Europe. Analyze how the 
+    transition from agrarian economies to manufacturing hubs changed the social fabric 
+    of major cities like London and Manchester. Mention the technological breakthroughs 
+    in steam power and textile production that accelerated this shift. Conclude by 
+    describing the environmental consequences of rapid industrialization and how it 
+    eventually led to the first major public health and labor movements in human history.
