@@ -64,29 +64,26 @@ All benchmark arguments, parameters and environment settings are located in the 
 nano docker-compose.yml
 ```
 
-```python
+```yaml
 # adjust the parameters for your benchmark in the section below.
 ...
-# =========================== Benchmark Parameter ===========================
-hf_models = ["amd/gpt-oss-120b-w-mxfp4-a-fp8",
-             "amd/Llama-3.3-70B-Instruct-FP8-KV",
-             "unsloth/Mistral-Small-3.2-24B-Instruct-2506-FP8",
-             "RedHatAI/gemma-3-27b-it-FP8-dynamic",
-             "amd/Llama-3.1-8B-Instruct-FP8-KV",
-             "Qwen/Qwen3-4B-FP8",
-             "Qwen/Qwen3-1.7B-FP8"]
-hf_token = "<YOUR_HF-TOKEN>"
-input_lengths = [1024, 4096]
-output_lengths = [1024, 4096]
-dataset_type = "random"
-num_tokens = 50000
-concurrencies = [1, 4, 16, 32, 64, 128]
-device_type = "GPU"
-device_name = "MI300X"
-csv_path = f"./amd_{device_name.lower()}__vllm_integrated_benchmark_results.csv"
-docker_image = "<YOUR_DOCKER_IMAGE_NAME>"
-warmup_runs = 5
-# ===========================================================================
+# ==== Benchmark Arguments (will be ignored by docker) ====
+    # ...
+    x-benchmark-args:
+      models:
+        - "amd/Llama-3.1-8B-Instruct-FP8-KV"
+        - "inceptionai/jais-13b-chat"
+      hf_token: "<hf_token_here>"
+      device_type: GPU
+      device_name: MI300X
+      concurrencies: [1, 4]
+      input_lengths: [512, 1024]
+      output_lengths: [512, 1024]
+      dataset_type: random
+      num_tokens: 10000
+      csv_path: "./amd_vllm_integrated_benchmark_results.csv"
+      warmup_runs: 5
+    # =========================================================
 ...
 ```
 
@@ -138,6 +135,7 @@ docker compose run --rm vbench
 ```
 
 After the benchmark the container will clean itself up, leaving no garbage behind.
+
 
 <br>
 

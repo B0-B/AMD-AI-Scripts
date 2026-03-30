@@ -345,9 +345,10 @@ def integratedBenchmark (device_type: str="GPU",
 
     # Cast rows to csv
     delimiter = ','
-    csv_string = delimiter.join(list(output_rows[0].keys())) + '\n'
+    headers = list(output_rows[0].keys())
+    csv_string = delimiter.join(headers) + '\n'
     for row in output_rows:
-        csv_string += delimiter.join(list(row.values())) + '\n'
+        csv_string += delimiter.join(map(str, row.values())) + '\n'
 
     # Save
     if not csv_output_path:
