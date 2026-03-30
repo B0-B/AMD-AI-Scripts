@@ -262,11 +262,11 @@ def singleBenchmark (bench: BaseBench,
 
     # Evaluate ITL statistics
     latencies.sort()
-    e2e_latency = sum(latencies) * 1e3 # Convert to ms
-    itl_mean = e2e_latency / n
-    itl_median = latencies[n // 2]
-    itl_sigma = stdDev(latencies, itl_mean)  # Use sample variance formula
-    itl_p99 = 2.326 * itl_sigma # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
+    e2e_latency = sum(latencies) 
+    itl_mean = e2e_latency / n  * 1e3 # Convert to ms
+    itl_median = latencies[n // 2] * 1e3 # Convert to ms
+    itl_sigma = stdDev(latencies, itl_mean) * 1e3 # Convert to ms  # Use sample variance formula
+    itl_p99 = 2.326 * itl_sigma * 1e3 # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
 
     # Collect results
     benchmark_results = {
