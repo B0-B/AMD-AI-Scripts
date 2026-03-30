@@ -56,15 +56,17 @@ python3 quick_bench.py \
 ### Integrated Benchmark
 ---
 
-This method can either be imported via `from vbench import integratedBenchmark` or run the prepared orchestration script `broad_bench.py`. In the ladder case it's recommended to copy the script to not break the original template
+This method can either be imported via `from vbench import integratedBenchmark` or run the prepared orchestration script `broad_bench.py`. 
+
+All benchmark arguments, parameters and environment settings are located in the ``docker-compose.yml``, please adjust the section below to fit your needs (see below).
 
 ```bash
-cp broad_bench.py my_broad_bench.py
+nano docker-compose.yml
 ```
 
-open the new ``my_broad_bench.py`` and adjust the benchmark parameter inside to fit your needs (see below).
-
 ```python
+# adjust the parameters for your benchmark in the section below.
+...
 # =========================== Benchmark Parameter ===========================
 hf_models = ["amd/gpt-oss-120b-w-mxfp4-a-fp8",
              "amd/Llama-3.3-70B-Instruct-FP8-KV",
@@ -85,9 +87,10 @@ csv_path = f"./amd_{device_name.lower()}__vllm_integrated_benchmark_results.csv"
 docker_image = "<YOUR_DOCKER_IMAGE_NAME>"
 warmup_runs = 5
 # ===========================================================================
+...
 ```
 
-This script will create a whole test pipeline by iterating over all parameter variations and the final test matrix will be exported to the provided path as a ``.csv`` file.
+The `broad_bench.py` will automatically source these arguments and create a whole test pipeline by iterating over all test cases and the final test matrix will be exported to the provided path in ``.csv`` format.
 
 
 <br>
@@ -107,7 +110,7 @@ export HIP_VISIBLE_DEVICES=0
 export ...
 
 # Option B: Source the provided environment file (recommended)
-set -a && source config.env && set +a
+set -a && source amd.env && set +a
 ```
 
 The benchmark can be started with
@@ -131,7 +134,7 @@ The detatched benchmark can be started with the provided ``run_broad_bench_docke
 bash run_broad_bench_docker.sh
 
 # Alternatively, use the raw docker command
-docker compose up -d
+docker compose run --rm vbench
 ```
 
 After the benchmark the container will clean itself up, leaving no garbage behind.

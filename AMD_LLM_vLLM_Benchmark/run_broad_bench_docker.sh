@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE_NAME="app" # The name defined in your docker-compose.yml
+SERVICE_NAME="vbench" # The name defined in your docker-compose.yml
 
 # 1. Print Start Message
 echo "[$(date +'%T')] vbench: Starting Docker Benchmarking Pipeline..."

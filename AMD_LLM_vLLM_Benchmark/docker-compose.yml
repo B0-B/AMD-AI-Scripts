@@ -1,5 +1,5 @@
 services:
-  app:
+  vbench:
     
     # Base environment
     image: docker.io/vllm/vllm-openai-rocm:latest
@@ -39,8 +39,8 @@ services:
 
     # Mount benchmark files
     volumes:
-      - .:/app
-    working_dir: /app
+      - .:/vbench
+    working_dir: /vbench
     entrypoint: ["/bin/sh", "-c"]
     command: ["python3 -u broad_bench.py > results/benchmark.log 2>&1"]
     # Clean up

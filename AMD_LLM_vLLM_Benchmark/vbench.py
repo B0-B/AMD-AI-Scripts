@@ -140,7 +140,7 @@ class BaseBench:
         Measures the mean time-to-first-token, median and standard deviation (in seconds) estimated from a single token generation.
         The TTFT will depend on the input length, the batch size and the general sampling parameter.
 
-        Returns a tuple with mean and deviation
+        Returns a list with mean, median and deviation
         '''
         
         print(f"[vBench]   Measure TTFT ...")
