@@ -149,7 +149,7 @@ class BaseBench:
         Measures the mean time-to-first-token, median and standard deviation (in seconds) estimated from a single token generation.
         The TTFT will depend on the input length, the batch size and the general sampling parameter.
 
-        Returns a list with mean, median and deviation
+        Returns a list with mean, median and deviation in seconds
         '''
         
         print(f"[vBench]   Measure TTFT ...")
@@ -160,7 +160,7 @@ class BaseBench:
             self.prompt(prompt_vector, sampling_params)
             stop    = perf_counter()
             # Perform time measurement
-            t       = stop - start # time in seconds
+            t       = (stop - start) * 1e-3 # time in seconds
             ttfts.append(t)
         
         ttfts.sort()
@@ -222,8 +222,8 @@ def singleBenchmark (bench: BaseBench,
         outputs = bench.prompt(prompts, sampling_params)
         stop = perf_counter()
 
-        # Denote latency
-        t = stop - start
+        # Denote latency in seconds
+        t = (stop - start) * 1e-3
         latencies.append(t)
 
         # Count output tokens
@@ -274,23 +274,23 @@ def singleBenchmark (bench: BaseBench,
         f"{device_type}": device,
         "max_input_length": input_length,
         "max_output_length": output_length,
-        "throughput": tokens_generated / e2e_latency,
-        "tpot_mean": tpot_mean,
-        "tpot_median": tpot_median,
-        "tpot_p99": tpot_p99,
-        "ttft_mean": ttft_mean,
-        "ttft_median": ttft_median,
-        "ttft_p99": ttft_p99,
-        "itl_mean": itl_mean,
-        "itl_median": itl_median,
-        "itl_p99": itl_p99,
+        "throughput": round(tokens_generated / e2e_latency, 2),
+        "tpot_mean": round(tpot_mean, 4),
+        "tpot_median": round(tpot_median, 4),
+        "tpot_p99": round(tpot_p99, 4),
+        "ttft_mean": round(ttft_mean, 4),
+        "ttft_median": round(ttft_median, 4),
+        "ttft_p99": round(ttft_p99, 4),
+        "itl_mean": round(itl_mean, 4),
+        "itl_median": round(itl_median, 4),
+        "itl_p99": round(itl_p99, 4),
         "concurrency": batch_size,
-        "precision": bench.dtype,
+        "precision": str(bench.dtype),
         "docker_image": docker_image,
-        "total_benchmark_time": e2e_latency,
-        "total_requests": requests,
-        "total_tokens_processed": tokens_processed,
-        "total_tokens_generated": tokens_generated,
+        "total_benchmark_time": round(e2e_latency, 2),
+        "total_requests": int(requests),
+        "total_tokens_processed": int(tokens_processed),
+        "total_tokens_generated": int(tokens_generated),
     }
 
     return benchmark_results
