@@ -12,7 +12,7 @@ hf_models = ["amd/gpt-oss-120b-w-mxfp4-a-fp8",
              "amd/Llama-3.1-8B-Instruct-FP8-KV",
              "Qwen/Qwen3-4B-FP8",
              "Qwen/Qwen3-1.7B-FP8"]
-hf_token = None
+hf_token = "<YOUR_HF-TOKEN>"
 input_lengths = [1024, 4096]
 output_lengths = [1024, 4096]
 dataset_type = "random"
