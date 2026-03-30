@@ -234,7 +234,7 @@ def singleBenchmark (bench: BaseBench,
             accumulated_output_token_count += len(bench.tokenizer.encode(full_text))
 
         # Compute the TPOT and denote it
-        tpot = (t - ttft_mean) / accumulated_output_token_count
+        tpot = (t - ttft_mean) / accumulated_output_token_count * 1e3 # convert to ms/token
         tpots.append(tpot)
 
         # Increment total tokens processed
@@ -262,7 +262,7 @@ def singleBenchmark (bench: BaseBench,
 
     # Evaluate ITL statistics
     latencies.sort()
-    e2e_latency = sum(latencies)
+    e2e_latency = sum(latencies) * 1e3 # Convert to ms
     itl_mean = e2e_latency / n
     itl_median = latencies[n // 2]
     itl_sigma = stdDev(latencies, itl_mean)  # Use sample variance formula
@@ -274,7 +274,7 @@ def singleBenchmark (bench: BaseBench,
         f"{device_type}": device,
         "max_input_length": input_length,
         "max_output_length": output_length,
-        "throughput": round(tokens_generated / e2e_latency, 2),
+        "throughput": round((tokens_processed + tokens_generated) / e2e_latency, 2),
         "tpot_mean": round(tpot_mean, 4),
         "tpot_median": round(tpot_median, 4),
         "tpot_p99": round(tpot_p99, 4),
