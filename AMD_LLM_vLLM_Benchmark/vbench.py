@@ -38,7 +38,6 @@ class BaseBench:
 
         self.llm = LLM(
             model=hf_model,
-            device=device_type.lower(),
             tokenizer=hf_model,
             trust_remote_code=True,
             tokenizer_mode="auto",

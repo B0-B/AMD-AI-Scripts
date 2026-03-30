@@ -9,7 +9,7 @@ echo "[$(date +'%T')] vbench: Starting Docker Benchmarking Pipeline..."
 mkdir -p ./results
 
 # 3. Start the container in background
-docker compose up -d
+docker compose up
 
 # 4. Wait for the container to finish
 echo "[$(date +'%T')] MONITORING: Waiting for script to complete..."
