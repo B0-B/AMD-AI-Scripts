@@ -60,14 +60,14 @@ class BaseBench:
         
         print(f"[vBench] Cleaning up {self.hf_model}...")
         
-        # 1. Destroy the vLLM engine and parallel processes
+        # Destroy the vLLM engine and parallel processes
         destroy_model_parallel()
         
-        # 2. Delete the LLM object and force garbage collection
+        # Delete the LLM object and force garbage collection
         del self.llm
         gc.collect()
         
-        # 3. Empty the GPU/ROCm cache
+        # Empty the GPU/ROCm cache
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
@@ -162,7 +162,7 @@ class BaseBench:
         return [ttft_mean, ttft_median, ttft_sigma]
 
 
-# ================= Single benchmark method =================
+# ================= Benchmark methods =================
 def singleBenchmark (bench: BaseBench,
                      batch_size: int=1,
                      num_tokens: int=2000,
@@ -261,7 +261,7 @@ def singleBenchmark (bench: BaseBench,
 
     # Collect results
     benchmark_results = {
-        "model": bench.model,
+        "model": bench.hf_model,
         f"{device_type}": device,
         "max_input_length": input_length,
         "max_output_length": output_length,
