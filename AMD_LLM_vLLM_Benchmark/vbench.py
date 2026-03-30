@@ -160,7 +160,7 @@ class BaseBench:
             self.prompt(prompt_vector, sampling_params)
             stop    = perf_counter()
             # Perform time measurement
-            t       = (stop - start) * 1e-3 # time in seconds
+            t       = stop - start # time in seconds
             ttfts.append(t)
         
         ttfts.sort()
@@ -223,15 +223,14 @@ def singleBenchmark (bench: BaseBench,
         stop = perf_counter()
 
         # Denote latency in seconds
-        t = (stop - start) * 1e-3
+        t = stop - start
         latencies.append(t)
 
         # Count output tokens
         accumulated_output_token_count = 0
         for output in outputs:
             generated_text = output.outputs[0].text
-            full_text = output.prompt + generated_text
-            accumulated_output_token_count += len(bench.tokenizer.encode(full_text))
+            accumulated_output_token_count += len(bench.tokenizer.encode(generated_text))
 
         # Compute the TPOT and denote it
         tpot = (t - ttft_mean) / accumulated_output_token_count * 1e3 # convert to ms/token
@@ -257,15 +256,15 @@ def singleBenchmark (bench: BaseBench,
     n = len(tpots)
     tpot_mean = sum(tpots) / n
     tpot_median = tpots[n // 2]
-    tpot_sigma = stdDev(tpots, tpot_mean) # Use sample variance formula
+    tpot_sigma = stdDev(tpots) # Use sample variance formula
     tpot_p99 = 2.326 * tpot_sigma # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
 
     # Evaluate ITL statistics
     latencies.sort()
-    e2e_latency = sum(latencies) 
+    e2e_latency = sum(latencies) # in s
     itl_mean = e2e_latency / n  * 1e3 # Convert to ms
-    itl_median = latencies[n // 2] * 1e3 # Convert to ms
-    itl_sigma = stdDev(latencies, itl_mean) * 1e3 # Convert to ms  # Use sample variance formula
+    itl_median = latencies[ n // 2 ] * 1e3 # Convert to ms
+    itl_sigma = stdDev(latencies) * 1e3 # Convert to ms  # Use sample variance formula
     itl_p99 = 2.326 * itl_sigma * 1e3 # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
 
     # Collect results
