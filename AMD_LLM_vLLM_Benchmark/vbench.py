@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-import os
-import sys
+import os, gc, sys
 # Try importing yaml, otherwise install it on-the-fly
 try:
     import yaml
@@ -9,12 +8,12 @@ except ImportError:
     os.system(f"{sys.executable} -m pip install pyyaml")
     import yaml
 from time import perf_counter
-import argparse
 import torch
 from pathlib import Path
 from random import sample, randint
 from huggingface_hub import login
 from vllm import LLM, SamplingParams
+from vllm.distributed.parallel_state import destroy_model_parallel
 
 
 def stdDev (values: list[float], mean: float|None=None) -> float:
@@ -55,6 +54,23 @@ class BaseBench:
         # Small Mixed Dataset
         self.small_mixed_yaml_filename = "prompt_dataset__small_mixed.yml"
     
+    def cleanup(self):
+
+        """Cleanly shuts down the vLLM engine to free memory for the next model."""
+        
+        print(f"[vBench] Cleaning up {self.hf_model}...")
+        
+        # 1. Destroy the vLLM engine and parallel processes
+        destroy_model_parallel()
+        
+        # 2. Delete the LLM object and force garbage collection
+        del self.llm
+        gc.collect()
+        
+        # 3. Empty the GPU/ROCm cache
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
     def prompt (self, prompts: list[str], sampling_params: SamplingParams):
         return self.llm.generate(prompts, sampling_params)
     
@@ -322,6 +338,10 @@ def integratedBenchmark (device_type: str="GPU",
 
                     output_rows.append(results)
                     test_case_run += 1
+
+        # Clean up to avoid memory exhaustion
+        bench.cleanup()
+        del bench
 
     # Cast rows to csv
     delimiter = ','

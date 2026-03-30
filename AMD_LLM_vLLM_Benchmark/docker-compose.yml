@@ -5,7 +5,7 @@ services:
     image: docker.io/vllm/vllm-openai-rocm:latest
     env_file:
       - ./amd.env
-
+    
     # ==== Benchmark Arguments (will be ignored by docker) ====
     x-benchmark-args:
       models:
@@ -29,6 +29,7 @@ services:
       - "/dev/dri:/dev/dri"
     group_add:
       - video
+    shm_size: '128gb' 
     cap_add:
       - SYS_PTRACE  # Common for ROCm/debugging
     security_opt:
