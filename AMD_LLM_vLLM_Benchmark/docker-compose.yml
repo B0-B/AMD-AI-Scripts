@@ -7,18 +7,27 @@ services:
       - ./amd.env
     
     # ==== Benchmark Arguments (will be ignored by docker) ====
+    # List of models:
+    # --------------------------------------
+    # amd/gpt-oss-120b-w-mxfp4-a-fp8
+    # amd/Llama-3.3-70B-Instruct-FP8-KV
+    # unsloth/Mistral-Small-3.2-24B-Instruct-2506-FP8
+    # RedHatAI/gemma-3-27b-it-FP8-dynamic
+    # amd/Llama-3.1-8B-Instruct-FP8-KV
+    # Qwen/Qwen3-4B-FP8
+    # Qwen/Qwen3-1.7B-FP8
+    # --------------------------------------
     x-benchmark-args:
       models:
         - "amd/Llama-3.1-8B-Instruct-FP8-KV"
-        - "amd/Llama-3.3-70B-Instruct-FP8-KV"
       hf_token: "<hf_token_here>"
       device_type: GPU
       device_name: MI300X
-      concurrencies: [1, 4, 8, 16, 32, 64]
-      input_lengths: [1024, 4096]
-      output_lengths: [1024, 4096]
+      concurrencies: [1, 4]
+      input_lengths: [512, 1024]
+      output_lengths: [512, 1024]
       dataset_type: random
-      num_tokens: 50000
+      num_tokens: 10000
       csv_path: "./amd_vllm_integrated_benchmark_results.csv"
       warmup_runs: 5
     # =========================================================
