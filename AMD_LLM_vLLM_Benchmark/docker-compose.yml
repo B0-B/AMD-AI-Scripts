@@ -1,9 +1,24 @@
 services:
   app:
+    
+    
     # Base environment
     image: docker.io/vllm/vllm-openai-rocm:latest
     env_file:
       - ./amd.env
+    # Mount devices
+    devices:
+      - "/dev/kfd:/dev/kfd"
+      - "/dev/dri:/dev/dri"
+    group_add:
+      - video
+    cap_add:
+      - SYS_PTRACE  # Common for ROCm/debugging
+    security_opt:
+      - seccomp:unconfined  # disables seccomp profiles
+    ipc: host  # High-performance computing often needs host IPC
+    network_mode: host  # Use 'host' for maximum network performance
+
     # Mount benchmark files
     volumes:
       - .:/app
