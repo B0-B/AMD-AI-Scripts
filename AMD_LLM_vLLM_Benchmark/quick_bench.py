@@ -25,7 +25,7 @@ def main ():
     parser.add_argument("--dataset", type=int, default=10, help="random or small-mixed")
     parser.add_argument("--warmup_runs", type=int, default=3, help="How many warmup iterations.")
     parser.add_argument("--max_output_len", type=int, default=256, help="Max tokens to generate per request.")
-    parser.add_argument("--max_input_len", type=int, default=256, help="Max tokens to input per request.")
+    parser.add_argument("--max_input_len", type=int, default=256, help="Max tokens to input per request. Note: this parameter only works with random dataset.")
     parser.add_argument("--batch_size", type=int, default=1, help="The number of prompts processed concurrently.")
     parser.add_argument("--temperature", type=float, default=0, help="The sampling temperature, default=0")
     parser.add_argument("--top_p", type=float, default=1.0, help="Controls the cumulative probability of the top tokens to consider. Must be in (0, 1]. Set to 1 to consider all tokens.")

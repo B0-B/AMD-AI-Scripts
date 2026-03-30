@@ -1,0 +1,14 @@
+services:
+  app:
+    # Base environment
+    image: docker.io/vllm/vllm-openai-rocm:latest
+    env_file:
+      - ./amd.env
+    # Mount benchmark files
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      sh -c "python3 broad_bench.py > results/benchmark.log 2>&1"
+    # Clean up
+    restart: "no"
