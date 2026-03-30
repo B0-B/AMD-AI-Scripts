@@ -6,6 +6,23 @@ services:
     image: docker.io/vllm/vllm-openai-rocm:latest
     env_file:
       - ./amd.env
+
+    # ---- Benchmark Arguments (will be ignored by docker) ----
+    x-benchmark-args:
+      models:
+        - "amd/Llama-3.1-8B-Instruct-FP8-KV"
+        - "amd/Llama-3.3-70B-Instruct-FP8-KV"
+      hf_token: "<hf_token_here>"
+      device_type: GPU
+      device_name: MI300X
+      concurrencies: [1, 4, 8, 16, 32, 64]
+      input_lengths: [1024, 4096]
+      output_lengths: [1024, 4096]
+      dataset_type: random
+      num_tokens: 50000
+      csv_path: "./amd_vllm_integrated_benchmark_results.csv"
+      warmup_runs: 5
+
     # Mount devices
     devices:
       - "/dev/kfd:/dev/kfd"
