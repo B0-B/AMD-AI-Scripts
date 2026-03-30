@@ -140,7 +140,7 @@ class BaseBench:
         
         ttfts.sort()
         ttft_mean = sum(ttfts) / probings
-        ttft_median = ttfts[probings/2 if probings %2 == 0 else (probings-1)/2+1]
+        ttft_median = ttfts[int(probings/2) if probings % 2 == 0 else int((probings-1)/2+1)]
         ttft_sigma = stdDev(ttfts, ttft_mean) # Use sample variance formula
 
         return [ttft_mean, ttft_median, ttft_sigma]
@@ -231,7 +231,7 @@ def singleBenchmark (bench: BaseBench,
     tpots.sort()
     n = len(tpots)
     tpot_mean = sum(tpots) / n
-    tpot_median = tpots[n/2 if n % 2 == 0 else (n-1)/2+1]
+    tpot_median = tpots[int(n/2) if n % 2 == 0 else int((n-1)/2+1)]
     tpot_sigma = stdDev(tpots, tpot_mean) # Use sample variance formula
     tpot_p99 = 2.326 * tpot_sigma # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
 
@@ -239,7 +239,7 @@ def singleBenchmark (bench: BaseBench,
     latencies.sort()
     e2e_latency = sum(latencies)
     itl_mean = e2e_latency / n
-    itl_median = latencies[n/2 if n % 2 == 0 else (n-1)/2+1]
+    itl_median = latencies[int(n/2) if n % 2 == 0 else int((n-1)/2+1)]
     itl_sigma = stdDev(latencies, itl_mean)  # Use sample variance formula
     itl_p99 = 2.326 * itl_sigma # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
 
