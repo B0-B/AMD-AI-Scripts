@@ -1,6 +1,6 @@
 # AMD LLM Benchmark with vLLM
 
-The benchmark shipped with vLLM engine requires two separate servers often separated in two containers, one for hosting the model and the other for running the benchmark and prompting against the model. This approach is not only impractical, but may introduce query latency and overhead due to the TCP route between the containers. 
+The built-in benchmark shipped with the vLLM engine requires by design two separate servers - often separated in two containers, one for hosting the model and the other for running the benchmark and prompting against the end-point. This approach is not only impractical, but may introduce query latency and overhead due to the TCP route between the containers. 
 Instead, a simple customizable benchmark API can benchmark `CasualLM` models E2E on [vLLM](https://rocm.docs.amd.com/projects/radeon/en/latest/docs/advanced/vllm/vllm.html) within a single thread/container.
 
 ## vBench
@@ -31,7 +31,7 @@ An integrated vLLM benchmark API with pre-tuned environment for AMD/ROCm.
 
 ## Usage
 
-It is recommended to clone the entire project and change into the ``../AMD_LLM_vLLM_Benchmark`` directory.
+It is recommended to clone the entire project on the host system and change into the ``../AMD_LLM_vLLM_Benchmark`` directory.
 
 
 ### Single Configuration Benchmark
@@ -56,7 +56,7 @@ python3 quick_bench.py \
 ### Integrated Benchmark
 ---
 
-This method can either be imported via `from vbench import integratedBenchmark` or run the prepared orchestration script `broad_bench.py`. In the ladder case we recommend to copy the script to not break the original template
+This method can either be imported via `from vbench import integratedBenchmark` or run the prepared orchestration script `broad_bench.py`. In the ladder case it's recommended to copy the script to not break the original template
 
 ```bash
 cp broad_bench.py my_broad_bench.py
@@ -97,8 +97,20 @@ This script will create a whole test pipeline by iterating over all parameter va
 
 
 #### Direct Python Execution
+---
 
-The benchmark script can be executed in any prepared environment with a python interpreter (3.12 or later) 
+The benchmark script can be executed in any prepared environment with a python interpreter (3.12 or later). Make sure that all necessary environment variables are set correctly. Optionally use the provided environment files
+
+```bash
+# Option A: Use your custom environment variables 
+export HIP_VISIBLE_DEVICES=0
+export ...
+
+# Option B: Source the provided environment file (recommended)
+set -a && source config.env && set +a
+```
+
+The benchmark can be started with
 
 ```bash
 python my_broad_bench.py
@@ -108,6 +120,7 @@ The benchmark results and process logs will be available in the `/results` sub-d
 
 
 #### Docker Orchestration Pipeline
+---
 
 For docker setups this project provides a pre-configured test pipeline. Use the docker-compose.yml to adjust the orchestration to your needs, by default the orchestration will use amd.env tunable which will be sourced into the docker runtime, otherwise the paths can be adjusted to any custom tunable. As before, all benchmark results and process logs will be available in the `/results` sub-directory.
 
