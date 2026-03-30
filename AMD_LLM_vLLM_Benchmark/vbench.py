@@ -362,7 +362,7 @@ def integratedBenchmark (device_type: str="GPU",
     # Save
     if not csv_output_path:
         csv_output_path = Path(__file__).resolve().parent.joinpath('new_benchmark_output.csv')
-    with open(csv_output_path) as f:
+    with open(csv_output_path, "w+") as f:
         f.write(csv_string)
 
 def show (results: dict[str, int|float|str]) -> None:
