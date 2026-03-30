@@ -16,11 +16,20 @@ from vllm import LLM, SamplingParams
 from vllm.distributed.parallel_state import destroy_model_parallel
 
 
-def stdDev (values: list[float], mean: float|None=None) -> float:
+def stdDev(values: list[float], mean: float | None = None) -> float:
     n = len(values)
-    if not mean:
+    if n <= 1:
+        return 0.0
+    
+    if mean is None:
         mean = sum(values) / n
-    return (sum([(values[i] - mean)**2 for i in range(n)]) / (n - 1)) ** .5
+        
+    # Calculate sum of squared differences
+    variance_sum = sum((x - mean) ** 2 for x in values)
+    
+    # Use n - 1 for Sample Standard Deviation (Bessel's Correction)
+    return (variance_sum / (n - 1)) ** 0.5
+
 
 
 # =============== Base Bench Object =================
