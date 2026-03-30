@@ -37,10 +37,10 @@ if __name__ == '__main__':
 
         args = yaml.safe_load(f)
 
-        app = args['services']['app']
-        bargs = app['x-benchmark-args'] # benchmark args
+        service = args['services']['vbench']
+        bargs = service['x-benchmark-args'] # benchmark args
         
-        docker_image    = app['image']
+        docker_image    = service['image']
         device_type     = bargs['device_type']
         device_name     = bargs['device_name']
         dataset_type    = bargs['dataset_type']
