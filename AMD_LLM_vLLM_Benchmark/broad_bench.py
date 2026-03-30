@@ -26,9 +26,18 @@ warmup_runs = 5
 # ===========================================================================
 
 # Run benchmark
+import os
 from vbench import integratedBenchmark
 
 if __name__ == '__main__':
+
+    if device_type.lower() == 'cpu':
+        # Forces the runtime to see zero GPUs
+        os.environ["ROCM_VISIBLE_DEVICES"] = "-1"
+        os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+        # Optional: tell vLLM specifically to use the CPU backend
+        os.environ["VLLM_TARGET_DEVICE"] = "cpu"
+
     print(f"[vBench]   Start integrated benchmark of {device_name} ...")
     integratedBenchmark(device_type,
                         device_name,
