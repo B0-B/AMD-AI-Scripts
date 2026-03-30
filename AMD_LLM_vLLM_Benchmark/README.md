@@ -1,7 +1,7 @@
 # AMD LLM Benchmark with vLLM
 
 The benchmark shipped with vLLM engine requires two separate servers often separated in two containers, one for hosting the model and the other for running the benchmark and prompting against the model. This approach is not only impractical, but may introduce query latency and overhead due to the TCP route between the containers. 
-Instead a simple benchmark CLI tool benchmarks (E2E or integrated) `CasualLM` model within [vLLM](https://rocm.docs.amd.com/projects/radeon/en/latest/docs/advanced/vllm/vllm.html) with a single thread and laid back test pipeline.
+Instead, a simple customizable benchmark API can benchmark `CasualLM` models E2E on [vLLM](https://rocm.docs.amd.com/projects/radeon/en/latest/docs/advanced/vllm/vllm.html) within a single thread/container.
 
 ## vBench
 
@@ -13,6 +13,7 @@ An integrated vLLM benchmark API with pre-tuned environment for AMD/ROCm.
 - Multiple models, and sampling parameters
 - Output test matrix as CSV file
 - Accessible as module and CLI
+- Laid-back ``docker-compose`` pipeline
 
 ## Requirements
 
