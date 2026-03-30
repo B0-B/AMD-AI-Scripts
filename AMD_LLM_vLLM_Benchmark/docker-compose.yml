@@ -1,13 +1,12 @@
 services:
   app:
     
-    
     # Base environment
     image: docker.io/vllm/vllm-openai-rocm:latest
     env_file:
       - ./amd.env
 
-    # ---- Benchmark Arguments (will be ignored by docker) ----
+    # ==== Benchmark Arguments (will be ignored by docker) ====
     x-benchmark-args:
       models:
         - "amd/Llama-3.1-8B-Instruct-FP8-KV"
@@ -22,6 +21,7 @@ services:
       num_tokens: 50000
       csv_path: "./amd_vllm_integrated_benchmark_results.csv"
       warmup_runs: 5
+    # =========================================================
 
     # Mount devices
     devices:
