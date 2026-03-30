@@ -21,7 +21,7 @@ concurrencies = [1, 4, 16, 32, 64, 128]
 device_type = "GPU"
 device_name = "MI300X"
 csv_path = f"./amd_{device_name.lower()}__vllm_integrated_benchmark_results.csv"
-docker_image = "my_docker_image_name"
+docker_image = "<YOUR_DOCKER_IMAGE_NAME>"
 warmup_runs = 5
 # ===========================================================================
 
