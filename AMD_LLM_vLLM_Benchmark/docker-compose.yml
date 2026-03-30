@@ -28,7 +28,7 @@ services:
       output_lengths: [512, 1024]
       dataset_type: random
       num_tokens: 2000
-      csv_path: "./amd_vllm_integrated_benchmark_results.csv"
+      csv_path: "./results/amd_vllm_integrated_benchmark_results.csv"
       warmup_runs: 5
     # =========================================================
 

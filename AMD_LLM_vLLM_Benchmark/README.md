@@ -122,9 +122,8 @@ The benchmark results and process logs will be available in the `/results` sub-d
 #### Docker Orchestration Pipeline
 ---
 
-For docker setups this project provides a pre-configured test pipeline. Use the docker-compose.yml to adjust the orchestration to your needs, by default the orchestration will use amd.env tunable which will be sourced into the docker runtime, otherwise the paths can be adjusted to any custom tunable. As before, all benchmark results and process logs will be available in the `/results` sub-directory.
-
-The detatched benchmark can be started with the provided ``run_broad_bench_docker.sh`` file which is more verbose, or using the raw docker compose command
+For docker setups this project provides a pre-configured test pipeline. Use the docker-compose.yml to adjust the orchestration to your needs, by default the orchestration will use ``amd.env`` tunable which will be sourced into the docker runtime, otherwise the paths can be adjusted to any custom tunable via the arguments in the ``docker-compose.yml`` - make sure the yaml is set to your needs.
+The benchmark can be started with the provided ``run_broad_bench_docker.sh`` file which is verbose, or simply by using the raw docker compose command.
 
 ```bash
 # Recommended
@@ -134,7 +133,7 @@ bash run_broad_bench_docker.sh
 docker compose run --rm vbench
 ```
 
-After the benchmark the container will clean itself up, leaving no garbage behind.
+After the benchmark the container will clean itself up, leaving no garbage behind. As before, all benchmark results and process logs will be available in the `/results` sub-directory. 
 
 
 <br>
