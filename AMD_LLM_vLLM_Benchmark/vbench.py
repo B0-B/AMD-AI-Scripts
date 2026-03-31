@@ -12,6 +12,7 @@ from time import perf_counter
 from pathlib import Path
 from random import sample, randint
 from huggingface_hub import login
+from traceback import format_exc
 from vllm import LLM, SamplingParams
 from vllm.distributed.parallel_state import destroy_model_parallel
 
@@ -170,7 +171,7 @@ def singleBenchmark (bench: BaseBench,
     batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
     while (tokens_processed < num_tokens):
-
+        
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
 
@@ -304,41 +305,51 @@ def integratedBenchmark (device_type: str="GPU",
 
     for model in hf_models:
 
-        bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
+        try:
 
-        # Load the dataset
-        bench.loadDataset(dataset_type)
+            bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
 
-        for input_len in input_lengths:
+            # Load the dataset
+            bench.loadDataset(dataset_type)
 
-            for output_len in output_lengths:
+            for input_len in input_lengths:
 
-                for batch_size in batch_sizes:
-                    
-                    # Print progress
-                    progress = round(test_case_run / total_test_cases * 100, 1)
-                    print(f"[vBench]   Running Benchmark... ({progress}% completed)\
-                                       Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
+                for output_len in output_lengths:
 
-                    results = singleBenchmark(bench, 
-                                              batch_size, 
-                                              num_tokens, 
-                                              dataset_type, 
-                                              input_len, 
-                                              output_len, 
-                                              warmup_runs, 
-                                              temperature, 
-                                              top_p,
-                                              device_type,
-                                              device,
-                                              docker_image)
+                    for batch_size in batch_sizes:
+                        
+                        # Print progress
+                        progress = round(test_case_run / total_test_cases * 100, 1)
+                        print(f"[vBench]   Running Benchmark... ({progress}% completed)\
+                                        Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
 
-                    output_rows.append(results)
-                    test_case_run += 1
+                        results = singleBenchmark(bench, 
+                                                batch_size, 
+                                                num_tokens, 
+                                                dataset_type, 
+                                                input_len, 
+                                                output_len, 
+                                                warmup_runs, 
+                                                temperature, 
+                                                top_p,
+                                                device_type,
+                                                device,
+                                                docker_image)
 
-        # Clean up to avoid memory exhaustion
-        bench.cleanup()
-        del bench
+                        output_rows.append(results)
+                        test_case_run += 1
+            
+        except Exception as e:
+
+            print(f"[vBench]   Encountered Error with model {model}:\n{format_exc()}")
+            print("[vBench]   Skip model ...")
+
+        finally:
+
+            # Clean up to avoid memory exhaustion
+            print("[vBench]   Cleanup bench object ...")
+            bench.cleanup()
+            del bench
 
     # Cast rows to csv
     delimiter = ','
