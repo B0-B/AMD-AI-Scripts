@@ -143,33 +143,6 @@ class BaseBench:
         
         return output_vector
 
-    def ttft (self, sampling_params: SamplingParams, batch_size: int=1, random_input_length: int|None=None, probings: int=10) -> list[float, float, float]:
-        
-        '''
-        Measures the mean time-to-first-token, median and standard deviation (in seconds) estimated from a single token generation.
-        The TTFT will depend on the input length, the batch size and the general sampling parameter.
-
-        Returns a list with mean, median and deviation in seconds
-        '''
-        
-        print(f"[vBench]   Measure TTFT ...")
-        ttfts = []
-        for _ in range( probings ):
-            prompt_vector = self.samplePromptVector(batch_size, random_input_length)
-            start   = perf_counter()
-            self.prompt(prompt_vector, sampling_params)
-            stop    = perf_counter()
-            # Perform time measurement
-            t       = stop - start # time in seconds
-            ttfts.append(t)
-        
-        ttfts.sort()
-        ttft_mean = sum(ttfts) / probings
-        ttft_median = ttfts[probings // 2]
-        ttft_sigma = stdDev(ttfts, ttft_mean) # Use sample variance formula
-
-        return [ttft_mean, ttft_median, ttft_sigma]
-
 
 # ================= Benchmark methods =================
 def singleBenchmark (bench: BaseBench,
@@ -201,40 +174,61 @@ def singleBenchmark (bench: BaseBench,
         prompts = bench.samplePromptVector(batch_size, input_length)
         _ = bench.prompt(prompts, sampling_params=sampling_params)
 
-    # Before iteration probe the TTFT statistics
-    ttft_mean, ttft_median, ttft_dev = bench.ttft(sampling_params, batch_size, input_length, probings=10)
-    ttft_p99 = 2.326 * ttft_dev # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
-
     # Iterate
     tokens_processed = 0
     tokens_generated = 0
-    requests = 0
-    latencies = []
-    tpots = []
+    requests    = 0
+    latencies   = []
+    tpots       = []
+    ttfts       = []
+    itls        = []
+    batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
     while (tokens_processed < num_tokens):
 
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
 
-        # Query
-        start = perf_counter()
+        # Forward propagation
         outputs = bench.prompt(prompts, sampling_params)
-        stop = perf_counter()
 
-        # Denote latency in seconds
-        t = stop - start
-        latencies.append(t)
+        # Count total tokens generated and total generation time for the batch
+        batch_token_intervals = 0
+        batch_decode_duration  = 0 # cumulative decoding duration of all requests
+        
+        # Count the total global time per batch
+        batch_total_time = max(o.metrics.last_token_ts for o in outputs) - min(o.metrics.arrival_time for o in outputs)
+        batch_latencies.append(batch_total_time)
 
-        # Count output tokens
-        accumulated_output_token_count = 0
+        # Iterate over all requests in batch to create a batch mean
         for output in outputs:
-            generated_text = output.outputs[0].text
-            accumulated_output_token_count += len(bench.tokenizer.encode(generated_text))
 
-        # Compute the TPOT and denote it
-        tpot = (t - ttft_mean) / accumulated_output_token_count * 1e3 # convert to ms/token
-        tpots.append(tpot)
+            request_duration = output.metrics.last_token_ts - output.metrics.arrival_time
+            generated_len_request = len(output.outputs[0].token_ids) 
+
+            # Add request latency
+            latencies.append(request_duration)
+
+            # Avoid zero division by skipping faulty request outputs with 0 or 1 tokens generated
+            if generated_len_request <= 1: continue
+
+            # Request TTFT
+            ttft_request = (output.metrics.first_token_ts - output.metrics.arrival_time)
+            ttfts.append(ttft_request)
+
+            # Formula for request TPOT
+            tpot_request = (request_duration - ttft_request) * 1e3 / (generated_len_request - 1)
+            tpots.append(tpot_request)
+
+            # Denote number of generated tokens in this request
+            batch_tokens_intervals += generated_len_request - 1
+            batch_decode_duration += request_duration - ttft_request
+
+        # Denote latency for the request
+        # latencies.append(request_duration)
+        if batch_tokens_intervals == 0: continue
+        itl = batch_decode_duration / batch_token_intervals * 1e3 # convert to ms
+        itls.append( itl )    
 
         # Increment total tokens processed
         if dataset_type == 'random':
@@ -246,26 +240,35 @@ def singleBenchmark (bench: BaseBench,
                 tokens_processed += len(bench.tokenizer.encode(p))
 
         # Increment the number of generated tokens and requests
-        tokens_generated += accumulated_output_token_count
         requests += batch_size
         
     print('\n\n[vBench]   Benchmark finished.')
 
+    # Retrieve the number of total requests
+    n = len(tpots)
+    e2e_latency = sum(batch_latencies) # in ms
+
+    # Evaluate TTFT statistics
+    ttfts.sort()
+    ttft_mean = sum(ttfts) / n
+    ttft_median = ttfts[n // 2]
+    ttft_p99 = ttfts[int(0.99 * (n - 1))]
+
     # Evaluate TPOT statistics
     tpots.sort()
-    n = len(tpots)
     tpot_mean = sum(tpots) / n
     tpot_median = tpots[n // 2]
-    tpot_sigma = stdDev(tpots) # Use sample variance formula
-    tpot_p99 = 2.326 * tpot_sigma # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
+    tpot_p99 = tpots[int(0.99 * (n - 1))]
 
     # Evaluate ITL statistics
-    latencies.sort()
-    e2e_latency = sum(latencies) # in s
-    itl_mean = e2e_latency / n  * 1e3 # Convert to ms
-    itl_median = latencies[ n // 2 ] * 1e3 # Convert to ms
-    itl_sigma = stdDev(latencies) * 1e3 # Convert to ms  # Use sample variance formula
-    itl_p99 = 2.326 * itl_sigma * 1e3 # In a standard normal distribution the 99th percentile is associated with approximately 2.326 sigma
+    n = len(itls)
+    itls.sort()
+    itl_mean = sum(itls) / n
+    itl_median = itls[ n // 2 ]
+    itl_p99 = itls[int(0.99 * (n - 1))]
+
+    # Evalutate throughput
+    throughput = (tokens_processed + tokens_generated) / e2e_latency
 
     # Collect results
     benchmark_results = {
@@ -273,7 +276,7 @@ def singleBenchmark (bench: BaseBench,
         f"{device_type}": device,
         "max_input_length": input_length,
         "max_output_length": output_length,
-        "throughput": round((tokens_processed + tokens_generated) / e2e_latency, 2),
+        "throughput": round(throughput, 2),
         "tpot_mean": round(tpot_mean, 4),
         "tpot_median": round(tpot_median, 4),
         "tpot_p99": round(tpot_p99, 4),
