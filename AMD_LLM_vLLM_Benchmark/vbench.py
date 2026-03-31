@@ -161,11 +161,9 @@ def singleBenchmark (bench: BaseBench,
         _ = bench.prompt(prompts, sampling_params=sampling_params)
 
     # Iterate
-    e2e_latency = 0
     tokens_processed = 0
     tokens_generated = 0
     requests    = 0
-    latencies   = []
     tpots       = []
     ttfts       = []
     itls        = []
@@ -180,24 +178,20 @@ def singleBenchmark (bench: BaseBench,
         start = perf_counter()
         outputs = bench.prompt(prompts, sampling_params)
         stop = perf_counter()
-        e2e_latency += stop - start
+
+        # Measure total latency for whole batch propagation (real e2e)
+        batch_latency = stop - start
+        batch_latencies.append(batch_latency)
 
         # Count total tokens generated and total generation time for the batch
         batch_token_intervals = 0
-        batch_decode_duration  = 0 # cumulative decoding duration of all requests
-        
-        # Measure the total time it took
-        batch_total_time = max(o.metrics.last_token_ts for o in outputs) - min(o.metrics.scheduled_ts for o in outputs)
-        batch_latencies.append(batch_total_time)
+        batch_decode_duration = 0 # cumulative decoding duration of all requests
 
         # Iterate over all requests in batch to create a batch mean
         for output in outputs:
 
-            request_duration = output.metrics.last_token_ts - output.metrics.scheduled_ts
+            # request_duration = output.metrics.last_token_ts - output.metrics.scheduled_ts
             generated_len_request = len(output.outputs[0].token_ids) 
-            
-            # Add request latency
-            latencies.append(request_duration)
 
             # Avoid zero division by skipping faulty request outputs with 0 or 1 tokens generated
             if generated_len_request <= 1: continue
@@ -213,12 +207,11 @@ def singleBenchmark (bench: BaseBench,
             tpot_request = decode_duration_request * 1e3 / (generated_len_request - 1)
             tpots.append(tpot_request)
 
-            # Denote number of generated tokens in this request
+            # Denote the number of generated tokens in this request
             batch_token_intervals += generated_len_request - 1
             batch_decode_duration += decode_duration_request
 
         # Denote latency for the request
-        # latencies.append(request_duration)
         if batch_token_intervals == 0: continue
         itl = batch_decode_duration / batch_token_intervals * 1e3 # convert to ms
         itls.append( itl )    
@@ -236,6 +229,8 @@ def singleBenchmark (bench: BaseBench,
         requests += batch_size
         
     print('\n\n[vBench]   Benchmark finished.')
+
+    e2e_latency = sum(batch_latencies)
 
     # Evaluate TTFT statistics
     n = len(ttfts)
