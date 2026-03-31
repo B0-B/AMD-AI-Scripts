@@ -7,7 +7,6 @@ except ImportError:
     # Use sys.executable to target the current python environment
     os.system(f"{sys.executable} -m pip install pyyaml")
     import yaml
-from time import perf_counter
 import torch
 from pathlib import Path
 from random import sample, randint
