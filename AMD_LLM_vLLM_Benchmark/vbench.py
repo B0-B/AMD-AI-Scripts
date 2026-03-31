@@ -206,12 +206,12 @@ def singleBenchmark (bench: BaseBench,
             tpots.append(tpot_request)
 
             # Denote number of generated tokens in this request
-            batch_tokens_intervals += generated_len_request - 1
+            batch_token_intervals += generated_len_request - 1
             batch_decode_duration += request_duration - ttft_request
 
         # Denote latency for the request
         # latencies.append(request_duration)
-        if batch_tokens_intervals == 0: continue
+        if batch_token_intervals == 0: continue
         itl = batch_decode_duration / batch_token_intervals * 1e3 # convert to ms
         itls.append( itl )    
 
