@@ -190,6 +190,7 @@ def singleBenchmark (bench: BaseBench,
 
             request_duration = output.metrics.last_token_ts - output.metrics.arrival_time
             generated_len_request = len(output.outputs[0].token_ids) 
+            tokens_generated += generated_len_request
 
             # Add request latency
             latencies.append(request_duration)
@@ -198,11 +199,12 @@ def singleBenchmark (bench: BaseBench,
             if generated_len_request <= 1: continue
 
             # Request TTFT
-            ttft_request = (output.metrics.first_token_ts - output.metrics.arrival_time)
+            ttft_request = max(0, output.metrics.first_token_ts - output.metrics.arrival_time)
             ttfts.append(ttft_request)
 
             # Formula for request TPOT
-            tpot_request = (request_duration - ttft_request) * 1e3 / (generated_len_request - 1)
+            decode_duration = max(0, request_duration - ttft_request)
+            tpot_request = decode_duration * 1e3 / (generated_len_request - 1)
             tpots.append(tpot_request)
 
             # Denote number of generated tokens in this request
@@ -229,17 +231,18 @@ def singleBenchmark (bench: BaseBench,
         
     print('\n\n[vBench]   Benchmark finished.')
 
-    # Retrieve the number of total requests
-    n = len(tpots)
-    e2e_latency = sum(batch_latencies) # in ms
+    # E2E latency by adding all batched durations
+    e2e_latency = sum(batch_latencies) # in seconds
 
     # Evaluate TTFT statistics
+    n = len(ttfts)
     ttfts.sort()
     ttft_mean = sum(ttfts) / n
     ttft_median = ttfts[n // 2]
     ttft_p99 = ttfts[int(0.99 * (n - 1))]
 
     # Evaluate TPOT statistics
+    n = len(tpots)
     tpots.sort()
     tpot_mean = sum(tpots) / n
     tpot_median = tpots[n // 2]
