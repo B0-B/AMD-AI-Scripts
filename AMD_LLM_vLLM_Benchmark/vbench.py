@@ -8,6 +8,7 @@ except ImportError:
     os.system(f"{sys.executable} -m pip install pyyaml")
     import yaml
 import torch
+from time import perf_counter
 from pathlib import Path
 from random import sample, randint
 from huggingface_hub import login
@@ -160,6 +161,7 @@ def singleBenchmark (bench: BaseBench,
         _ = bench.prompt(prompts, sampling_params=sampling_params)
 
     # Iterate
+    e2e_latency = 0
     tokens_processed = 0
     tokens_generated = 0
     requests    = 0
@@ -175,41 +177,45 @@ def singleBenchmark (bench: BaseBench,
         prompts = bench.samplePromptVector(batch_size, input_length)
 
         # Forward propagation
+        start = perf_counter()
         outputs = bench.prompt(prompts, sampling_params)
+        stop = perf_counter()
+        e2e_latency += stop - start
 
         # Count total tokens generated and total generation time for the batch
         batch_token_intervals = 0
         batch_decode_duration  = 0 # cumulative decoding duration of all requests
         
-        # Count the total global time per batch
-        batch_total_time = max(o.metrics.last_token_ts for o in outputs) - min(o.metrics.arrival_time for o in outputs)
+        # Measure the total time it took
+        batch_total_time = max(o.metrics.last_token_ts for o in outputs) - min(o.metrics.scheduled_ts for o in outputs)
         batch_latencies.append(batch_total_time)
 
         # Iterate over all requests in batch to create a batch mean
         for output in outputs:
 
-            request_duration = output.metrics.last_token_ts - output.metrics.arrival_time
+            request_duration = output.metrics.last_token_ts - output.metrics.scheduled_ts
             generated_len_request = len(output.outputs[0].token_ids) 
-            tokens_generated += generated_len_request
-
+            
             # Add request latency
             latencies.append(request_duration)
 
             # Avoid zero division by skipping faulty request outputs with 0 or 1 tokens generated
             if generated_len_request <= 1: continue
 
+            tokens_generated += generated_len_request
+
             # Request TTFT
-            ttft_request = max(0, output.metrics.first_token_ts - output.metrics.arrival_time)
+            ttft_request = output.metrics.first_token_ts - output.metrics.scheduled_ts
             ttfts.append(ttft_request)
 
             # Formula for request TPOT
-            decode_duration = max(0, request_duration - ttft_request)
-            tpot_request = decode_duration * 1e3 / (generated_len_request - 1)
+            decode_duration_request = output.metrics.last_token_ts - output.metrics.first_token_ts
+            tpot_request = decode_duration_request * 1e3 / (generated_len_request - 1)
             tpots.append(tpot_request)
 
             # Denote number of generated tokens in this request
             batch_token_intervals += generated_len_request - 1
-            batch_decode_duration += request_duration - ttft_request
+            batch_decode_duration += decode_duration_request
 
         # Denote latency for the request
         # latencies.append(request_duration)
@@ -230,9 +236,6 @@ def singleBenchmark (bench: BaseBench,
         requests += batch_size
         
     print('\n\n[vBench]   Benchmark finished.')
-
-    # E2E latency by adding all batched durations
-    e2e_latency = sum(batch_latencies) # in seconds
 
     # Evaluate TTFT statistics
     n = len(ttfts)
