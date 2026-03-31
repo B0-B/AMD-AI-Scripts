@@ -15,22 +15,6 @@ from vllm import LLM, SamplingParams
 from vllm.distributed.parallel_state import destroy_model_parallel
 
 
-def stdDev(values: list[float], mean: float | None = None) -> float:
-    n = len(values)
-    if n <= 1:
-        return 0.0
-    
-    if mean is None:
-        mean = sum(values) / n
-        
-    # Calculate sum of squared differences
-    variance_sum = sum((x - mean) ** 2 for x in values)
-    
-    # Use n - 1 for Sample Standard Deviation (Bessel's Correction)
-    return (variance_sum / (n - 1)) ** 0.5
-
-
-
 # =============== Base Bench Object =================
 class BaseBench:
 
@@ -38,19 +22,21 @@ class BaseBench:
         
         self.location = Path(__file__).resolve().parent
 
-        self.hf_model = hf_model
-
         if hf_token:
             login(token=hf_token)
 
+        self.hf_model = hf_model
         self.llm = LLM(
             model=hf_model,
             tokenizer=hf_model,
             trust_remote_code=True,
             tokenizer_mode="auto",
             download_dir=None,
-            hf_token=hf_token
+            hf_token=hf_token,
+            disable_log_stats = False, # enable metrics collection
+            enforce_eager=True 
         )
+
         self.tokenizer = self.llm.get_tokenizer()
         self.vocab_size = self.tokenizer.vocab_size
         self.dtype = self.llm.llm_engine.model_config.dtype
