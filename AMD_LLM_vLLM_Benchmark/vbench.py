@@ -201,8 +201,8 @@ def singleBenchmark (bench: BaseBench,
     itls        = []
     batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
-    while ( num_tokens != None and tokens_processed < num_tokens   or   num_iterations != None and iteration_count < num_iterations ):
-        
+    while ( ( num_tokens != None and tokens_processed < num_tokens )  or  ( num_iterations != None and iteration_count < num_iterations ) ):
+
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
 
