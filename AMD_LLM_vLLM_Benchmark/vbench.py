@@ -134,7 +134,8 @@ class BaseBench:
 # ================= Benchmark methods =================
 def singleBenchmark (bench: BaseBench,
                      batch_size: int=1,
-                     num_tokens: int=2000,
+                     num_tokens: int|None=None,
+                     num_iterations: int|None=None,
                      dataset_type: str="random",
                      input_length: int = 256,
                      output_length: int = 256,
@@ -144,6 +145,35 @@ def singleBenchmark (bench: BaseBench,
                      device_type: str="GPU",
                      device: str="n/a",
                      docker_image: str="n/a") -> dict[str, int|float|str]:
+    
+    """
+    Executes a single benchmark run for a given model configuration.
+
+    Note: Either 'num_tokens' or 'num_iterations' must be provided to define 
+    the benchmark duration/constraint.
+
+    Args:
+        bench: The benchmark instance to execute.
+        batch_size: Number of sequences to process in parallel.
+        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations is used).
+        num_iterations: Total number of inference steps to run (not needed if num_tokens is used).
+        dataset_type: Source of input data (e.g., "random", "sharegpt").
+        input_length: Fixed length of the input prompt.
+        output_length: Maximum tokens to generate per iteration.
+        warmup_runs: Number of initial iterations to exclude from metrics.
+        temperature: Sampling temperature (0 for greedy decoding).
+        top_p: Nucleus sampling probability threshold.
+        device_type: Hardware backend (e.g., "GPU", "CPU").
+        device: Specific device identifier or name.
+        docker_image: Environment tag for reproducibility tracking.
+
+    Returns:
+        A dictionary containing performance metrics and configuration metadata.
+    """
+    
+    # Check for bounds
+    if num_tokens is None and num_iterations is None:
+        raise ValueError("Please constrain the benchmark by either providing 'num_tokens' for total token number to process, or 'num_iterations' for a fixed amount of batched propagations.")
     
     # Load the dataset
     bench.loadDataset(dataset_type)
@@ -162,6 +192,7 @@ def singleBenchmark (bench: BaseBench,
         _ = bench.prompt(prompts, sampling_params=sampling_params)
 
     # Iterate
+    iteration_count  = 0
     tokens_processed = 0
     tokens_generated = 0
     requests    = 0
@@ -170,7 +201,7 @@ def singleBenchmark (bench: BaseBench,
     itls        = []
     batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
-    while (tokens_processed < num_tokens):
+    while ( num_tokens != None and tokens_processed < num_tokens   or   num_iterations != None and iteration_count < num_iterations ):
         
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
@@ -179,7 +210,7 @@ def singleBenchmark (bench: BaseBench,
         start = perf_counter()
         outputs = bench.prompt(prompts, sampling_params)
         stop = perf_counter()
-
+        
         # Measure total latency for whole batch propagation (real e2e)
         batch_latency = stop - start
         batch_latencies.append(batch_latency)
@@ -228,6 +259,7 @@ def singleBenchmark (bench: BaseBench,
 
         # Increment the number of generated tokens and requests
         requests += batch_size
+        iteration_count += 1
         
     print('\n\n[vBench]   Benchmark finished.')
 
@@ -289,7 +321,8 @@ def integratedBenchmark (device_type: str="GPU",
                          hf_models: list[str]=["inceptionai/jais-13b-chat"],
                          hf_token: str|None=None,
                          batch_sizes: list[int]=[1,4,8,16,32,64,128],
-                         num_tokens: int=2000,
+                         num_tokens: int|None=None,
+                         num_iterations: int|None=10,
                          dataset_type: str="random",
                          input_lengths: list[int] = [256, 512],
                          output_lengths: list[int] = [256, 512],
@@ -298,6 +331,32 @@ def integratedBenchmark (device_type: str="GPU",
                          top_p: float=1.0,
                          csv_output_path: str|Path|None=None,
                          docker_image: str="n/a") -> dict[str, int|float|str]:
+    
+    """
+    Executes an integrated benchmark for a given model by iterating over all provided configurations.
+    The final result will be provide results in a csv file.
+
+    Note: Either 'num_tokens' or 'num_iterations' must be provided to define 
+    the benchmark duration/constraint.
+
+    Args:
+        bench: The benchmark instance to execute.
+        batch_size: Number of sequences to process in parallel.
+        num_tokens: Total number of tokens to generate for each configuration (not needed if num_iterations is used).
+        num_iterations: Total number of inference steps to run per configuration (not needed if num_tokens is used).
+        dataset_type: Source of input data (e.g., "random", "sharegpt").
+        input_length: Fixed length of the input prompt.
+        output_length: Maximum tokens to generate per iteration.
+        warmup_runs: Number of initial iterations to exclude from metrics.
+        temperature: Sampling temperature (0 for greedy decoding).
+        top_p: Nucleus sampling probability threshold.
+        device_type: Hardware backend (e.g., "GPU", "CPU").
+        device: Specific device identifier or name.
+        docker_image: Environment tag for reproducibility tracking.
+
+    Returns:
+        A dictionary containing performance metrics and configuration metadata.
+    """
     
     output_rows: list[dict] = []
     test_case_run = 0
@@ -326,6 +385,7 @@ def integratedBenchmark (device_type: str="GPU",
                         results = singleBenchmark(bench, 
                                                 batch_size, 
                                                 num_tokens, 
+                                                num_iterations,
                                                 dataset_type, 
                                                 input_len, 
                                                 output_len, 
