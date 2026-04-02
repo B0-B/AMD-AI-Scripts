@@ -364,13 +364,17 @@ def integratedBenchmark (device_type: str="GPU",
 
     for model in hf_models:
 
+        bench: BaseBench|None = None
+
         try:
 
+            # For every model we initialize a new bench object
             bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
 
-            # Load the dataset
+            # Load the dataset into it
             bench.loadDataset(dataset_type)
 
+            # Test all configurations
             for input_len in input_lengths:
 
                 for output_len in output_lengths:
@@ -382,6 +386,7 @@ def integratedBenchmark (device_type: str="GPU",
                         print(f"[vBench]   Running Benchmark... ({progress}% completed)\
                                         Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
 
+                        # Perform benchmark
                         results = singleBenchmark(bench, 
                                                 batch_size, 
                                                 num_tokens, 
@@ -406,10 +411,14 @@ def integratedBenchmark (device_type: str="GPU",
 
         finally:
 
-            # Clean up to avoid memory exhaustion
-            print("[vBench]   Cleanup bench object ...")
-            bench.cleanup()
-            del bench
+            # Check if bench was actually created AND is not None
+            if bench is not None:
+                print("[vBench]   Cleanup bench object ...")
+                try:
+                    bench.cleanup()
+                except Exception as e:
+                    print(f"Cleanup failed: {e}")
+                del bench
 
     # Cast rows to csv
     delimiter = ','
