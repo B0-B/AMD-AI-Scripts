@@ -70,19 +70,22 @@ nano docker-compose.yml
 # ==== Benchmark Arguments (will be ignored by docker) ====
     # ...
     x-benchmark-args:
-      models:
+      models:                                                       # Define the list of models to test
         - "amd/Llama-3.1-8B-Instruct-FP8-KV"
         - "inceptionai/jais-13b-chat"
-      hf_token: "<hf_token_here>"
-      device_type: GPU
-      device_name: MI300X
-      concurrencies: [1, 4]
-      input_lengths: [512, 1024]
-      output_lengths: [512, 1024]
-      dataset_type: random
-      num_tokens: 10000
-      csv_path: "./amd_vllm_integrated_benchmark_results.csv"
-      warmup_runs: 5
+      hf_token: "<hf_token_here>"                                   # Provide huggingface token
+      device_type: GPU                                              # Which device type GPU or CPU
+      device_name: MI300X                                           # Device name
+      concurrencies: [1, 4]                                         # Number of parallel requests per iteration
+      input_lengths: [512, 1024]                                    # Input lengths to iterate over
+      output_lengths: [512, 1024]                                   # Output lengths to iterate over
+      dataset_type: random                                          # Dataset "random" or "small-mixed"
+      num_tokens: 10000                                             # Number of tokens to generate for 
+                                                                    # each configuration (not needed if num_iterations is used).
+      num_iterations: null                                          # Number of iterations or propagations per configuration
+                                                                    # (not needed if num_tokens is used).
+      csv_path: "./amd_vllm_integrated_benchmark_results.csv"       # CSV output path
+      warmup_runs: 5                                                # Warmup iterations before each configuration
     # =========================================================
 ...
 ```
