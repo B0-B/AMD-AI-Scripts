@@ -7,6 +7,7 @@ echo "[$(date +'%T')] vbench: Starting Docker Benchmarking Pipeline..."
 
 # Ensure results directory exists
 mkdir -p ./results
+touch ./results/benchmark.log
 
 # Start the container
 docker compose run --rm vbench

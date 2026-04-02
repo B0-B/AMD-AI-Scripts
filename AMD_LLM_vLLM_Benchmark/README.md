@@ -92,7 +92,6 @@ nano docker-compose.yml
 
 The `broad_bench.py` will automatically source these arguments and create a whole test pipeline by iterating over all test cases and the final test matrix will be exported to the provided path in ``.csv`` format.
 
-
 <br>
 
 ### Broad Benchmark Launch Options
@@ -138,6 +137,11 @@ docker compose run --rm vbench
 
 After the benchmark the container will clean itself up, leaving no garbage behind. As before, all benchmark results and process logs will be available in the `/results` sub-directory. 
 
+The progress can be inspected from the host system by simply inspecting the ``benchmark.log``
+
+```bash
+tail -n 20 results/benchmark.log
+```
 
 <br>
 
