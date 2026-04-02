@@ -359,8 +359,8 @@ def integratedBenchmark (device_type: str="GPU",
     """
     
     output_rows: list[dict] = []
-    test_case_run = 0
-    total_test_cases = len(hf_models) * len(input_lengths) * len(output_lengths) * len(batch_sizes)
+    test_configuration_count = 0
+    total_test_configurations = len(hf_models) * len(input_lengths) * len(output_lengths) * len(batch_sizes)
 
     for model in hf_models:
 
@@ -382,7 +382,7 @@ def integratedBenchmark (device_type: str="GPU",
                     for batch_size in batch_sizes:
                         
                         # Print progress
-                        progress = round(test_case_run / total_test_cases * 100, 1)
+                        progress = round(test_configuration_count / total_test_configurations * 100, 1)
                         print(f"[vBench]   Running Benchmark... ({progress}% completed)\
                                         Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
 
@@ -402,14 +402,16 @@ def integratedBenchmark (device_type: str="GPU",
                                                 docker_image)
 
                         output_rows.append(results)
-                        test_case_run += 1
-            
+                        
         except Exception as e:
 
             print(f"[vBench]   Encountered Error with model {model}:\n{format_exc()}")
             print("[vBench]   Skip model ...")
 
         finally:
+
+            # Increment the number of tested configurations
+            test_configuration_count += 1
 
             # Check if bench was actually created AND is not None
             if bench is not None:
