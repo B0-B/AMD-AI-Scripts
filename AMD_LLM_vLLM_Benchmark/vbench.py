@@ -335,7 +335,7 @@ def integratedBenchmark (device_type: str="GPU",
                          temperature: float=0,
                          top_p: float=1.0,
                          csv_output_path: str|Path|None=None,
-                         docker_image: str="n/a") -> dict[str, int|float|str]:
+                         docker_image: str="n/a") -> list[dict]:
     
     """
     Executes an integrated benchmark for a given model by iterating over all provided configurations.
@@ -372,7 +372,7 @@ def integratedBenchmark (device_type: str="GPU",
 
         # For every model we initialize a new bench object
         bench: BaseBench|None = None
-        bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
+        bench = BaseBench(model, hf_token=hf_token)
 
         # Load the dataset into it
         bench.loadDataset(dataset_type)
@@ -440,6 +440,8 @@ def integratedBenchmark (device_type: str="GPU",
         csv_output_path = Path(__file__).resolve().parent.joinpath('new_benchmark_output.csv')
     with open(csv_output_path, "w+") as f:
         f.write(csv_string)
+
+    return output_rows
 
 def show (results: dict[str, int|float|str]) -> None:
 
