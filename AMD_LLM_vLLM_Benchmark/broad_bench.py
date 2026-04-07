@@ -49,6 +49,7 @@ if __name__ == '__main__':
         concurrencies   = bargs['concurrencies']   
         num_tokens      = bargs['num_tokens']   
         num_iterations  = bargs['num_iterations']   
+        num_requests    = bargs['num_requests']  
         input_lengths   = bargs['input_lengths']    
         output_lengths  = bargs['output_lengths'] 
         warmup_runs     = bargs['warmup_runs'] 
@@ -71,6 +72,7 @@ if __name__ == '__main__':
                         concurrencies, 
                         num_tokens, 
                         num_iterations,
+                        num_requests,
                         dataset_type, 
                         input_lengths, 
                         output_lengths, 
