@@ -23,14 +23,15 @@ services:
       hf_token: "<hf_token_here>"
       device_type: GPU
       device_name: MI300X
-      concurrencies: [1, 4]
+      concurrencies: [1, 4, 16, 64]
       input_lengths: [512, 1024]
       output_lengths: [512, 1024]
       dataset_type: random
-      num_iterations: 10
+      num_iterations: null
       num_tokens: null
+      num_requests: 100
       csv_path: "./results/amd_vllm_integrated_benchmark_results.csv"
-      warmup_runs: 5
+      warmup_runs: 1
     # =========================================================
 
     # Mount devices

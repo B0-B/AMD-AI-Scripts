@@ -20,7 +20,7 @@ from vllm.distributed.parallel_state import destroy_model_parallel
 # =============== Base Bench Object =================
 class BaseBench:
 
-    def __init__(self, hf_model: str, hf_token: str|None=None, device_type: str="GPU"):
+    def __init__(self, hf_model: str, hf_token: str|None=None):
         
         self.location = Path(__file__).resolve().parent
 
@@ -136,6 +136,7 @@ def singleBenchmark (bench: BaseBench,
                      batch_size: int=1,
                      num_tokens: int|None=None,
                      num_iterations: int|None=None,
+                     num_requests: int|None=None,
                      dataset_type: str="random",
                      input_length: int = 256,
                      output_length: int = 256,
@@ -155,8 +156,9 @@ def singleBenchmark (bench: BaseBench,
     Args:
         bench: The benchmark instance to execute.
         batch_size: Number of sequences to process in parallel.
-        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations is used).
-        num_iterations: Total number of inference steps to run (not needed if num_tokens is used).
+        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations or num_request is used).
+        num_iterations: Total number of inference steps to run (not needed if num_tokens or num_request is used).
+        num_request: Total number of requests to the model (not needed if num_tokens or num_iterations is used).
         dataset_type: Source of input data (e.g., "random", "sharegpt").
         input_length: Fixed length of the input prompt.
         output_length: Maximum tokens to generate per iteration.
@@ -201,7 +203,9 @@ def singleBenchmark (bench: BaseBench,
     itls        = []
     batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
-    while ( ( num_tokens != None and tokens_processed < num_tokens )  or  ( num_iterations != None and iteration_count < num_iterations ) ):
+    while ( ( num_tokens != None and tokens_processed < num_tokens )  or
+            ( num_iterations != None and iteration_count < num_iterations ) or 
+            ( num_requests != None and requests < num_requests ) ):
 
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
@@ -323,6 +327,7 @@ def integratedBenchmark (device_type: str="GPU",
                          batch_sizes: list[int]=[1,4,8,16,32,64,128],
                          num_tokens: int|None=None,
                          num_iterations: int|None=10,
+                         num_requests: int|None=10,
                          dataset_type: str="random",
                          input_lengths: list[int] = [256, 512],
                          output_lengths: list[int] = [256, 512],
@@ -342,8 +347,9 @@ def integratedBenchmark (device_type: str="GPU",
     Args:
         bench: The benchmark instance to execute.
         batch_size: Number of sequences to process in parallel.
-        num_tokens: Total number of tokens to generate for each configuration (not needed if num_iterations is used).
-        num_iterations: Total number of inference steps to run per configuration (not needed if num_tokens is used).
+        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations or num_request is used).
+        num_iterations: Total number of inference steps to run (not needed if num_tokens or num_request is used).
+        num_request: Total number of requests to the model (not needed if num_tokens or num_iterations is used).
         dataset_type: Source of input data (e.g., "random", "sharegpt").
         input_length: Fixed length of the input prompt.
         output_length: Maximum tokens to generate per iteration.
@@ -364,23 +370,22 @@ def integratedBenchmark (device_type: str="GPU",
 
     for model in hf_models:
 
+        # For every model we initialize a new bench object
         bench: BaseBench|None = None
+        bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
 
-        try:
+        # Load the dataset into it
+        bench.loadDataset(dataset_type)
 
-            # For every model we initialize a new bench object
-            bench = BaseBench(model, hf_token=hf_token, device_type=device_type)
+        # Test all configurations
+        for input_len in input_lengths:
 
-            # Load the dataset into it
-            bench.loadDataset(dataset_type)
+            for output_len in output_lengths:
 
-            # Test all configurations
-            for input_len in input_lengths:
+                for batch_size in batch_sizes:
 
-                for output_len in output_lengths:
-
-                    for batch_size in batch_sizes:
-                        
+                    try:
+                    
                         # Print progress
                         progress = round(test_configuration_count / total_test_configurations * 100, 1)
                         print(f"[vBench]   Running Benchmark... ({progress}% completed)\
@@ -391,6 +396,7 @@ def integratedBenchmark (device_type: str="GPU",
                                                 batch_size, 
                                                 num_tokens, 
                                                 num_iterations,
+                                                num_requests,
                                                 dataset_type, 
                                                 input_len, 
                                                 output_len, 
@@ -402,25 +408,25 @@ def integratedBenchmark (device_type: str="GPU",
                                                 docker_image)
 
                         output_rows.append(results)
-                        
-        except Exception as e:
+                    
+                    except Exception as e:
 
-            print(f"[vBench]   Encountered Error with model {model}:\n{format_exc()}")
-            print("[vBench]   Skip model ...")
+                        print(f"[vBench]   Encountered Error:\n{format_exc()}")
+                        print(f"[vBench]   Skip configuration input_len={input_len} output_len={output_len} batch_size={batch_size} ...")
 
-        finally:
+                    finally:
 
-            # Increment the number of tested configurations
-            test_configuration_count += 1
+                        # Increment the number of tested configurations
+                        test_configuration_count += 1
 
-            # Check if bench was actually created AND is not None
-            if bench is not None:
-                print("[vBench]   Cleanup bench object ...")
-                try:
-                    bench.cleanup()
-                except Exception as e:
-                    print(f"Cleanup failed: {e}")
-                del bench
+        # Check if bench was actually created AND is not None
+        if bench is not None:
+            print("[vBench]   Cleanup bench object ...")
+            try:
+                bench.cleanup()
+            except Exception as e:
+                print(f"Cleanup failed: {e}")
+            del bench                        
 
     # Cast rows to csv
     delimiter = ','
