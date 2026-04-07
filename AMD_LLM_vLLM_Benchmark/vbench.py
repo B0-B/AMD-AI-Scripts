@@ -174,8 +174,9 @@ def singleBenchmark (bench: BaseBench,
     """
     
     # Check for bounds
-    if num_tokens is None and num_iterations is None:
-        raise ValueError("Please constrain the benchmark by either providing 'num_tokens' for total token number to process, or 'num_iterations' for a fixed amount of batched propagations.")
+    if num_tokens is None and num_iterations is None and num_requests is None:
+        raise ValueError("Please constrain the benchmark by either providing 'num_tokens' for total token number to process,\
+                          or 'num_iterations' for a fixed amount of batched propagations, or 'num_request' for total requests.")
     
     # Load the dataset
     bench.loadDataset(dataset_type)
