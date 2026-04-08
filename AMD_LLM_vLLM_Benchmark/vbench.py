@@ -134,9 +134,7 @@ class BaseBench:
 # ================= Benchmark methods =================
 def singleBenchmark (bench: BaseBench,
                      batch_size: int=1,
-                     num_tokens: int|None=None,
-                     num_iterations: int|None=None,
-                     num_requests: int|None=None,
+                     num_iterations: int=5,
                      dataset_type: str="random",
                      input_length: int = 256,
                      output_length: int = 256,
@@ -156,9 +154,7 @@ def singleBenchmark (bench: BaseBench,
     Args:
         bench: The benchmark instance to execute.
         batch_size: Number of sequences to process in parallel.
-        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations or num_request is used).
-        num_iterations: Total number of inference steps to run (not needed if num_tokens or num_request is used).
-        num_request: Total number of requests to the model (not needed if num_tokens or num_iterations is used).
+        num_iterations: Total number of batched propagations to run per configuration. Can be a number or list of numbers for each concurrency.
         dataset_type: Source of input data (e.g., "random", "sharegpt").
         input_length: Fixed length of the input prompt.
         output_length: Maximum tokens to generate per iteration.
@@ -172,11 +168,6 @@ def singleBenchmark (bench: BaseBench,
     Returns:
         A dictionary containing performance metrics and configuration metadata.
     """
-    
-    # Check for bounds
-    if num_tokens is None and num_iterations is None and num_requests is None:
-        raise ValueError("Please constrain the benchmark by either providing 'num_tokens' for total token number to process,\
-                          or 'num_iterations' for a fixed amount of batched propagations, or 'num_request' for total requests.")
     
     # Load the dataset
     bench.loadDataset(dataset_type)
@@ -204,9 +195,7 @@ def singleBenchmark (bench: BaseBench,
     itls        = []
     batch_latencies = []
     print('\n\n[vBench]   Benchmark started ...')
-    while ( ( num_tokens != None and tokens_processed < num_tokens )  or
-            ( num_iterations != None and iteration_count < num_iterations ) or 
-            ( num_requests != None and requests < num_requests ) ):
+    while ( iteration_count < num_iterations ):
 
         # Generate new batch of prompts
         prompts = bench.samplePromptVector(batch_size, input_length)
@@ -326,9 +315,7 @@ def integratedBenchmark (device_type: str="GPU",
                          hf_models: list[str]=["inceptionai/jais-13b-chat"],
                          hf_token: str|None=None,
                          batch_sizes: list[int]=[1,4,8,16,32,64,128],
-                         num_tokens: int|None=None,
-                         num_iterations: int|None=10,
-                         num_requests: int|None=10,
+                         num_iterations: int|list[int]=5,
                          dataset_type: str="random",
                          input_lengths: list[int] = [256, 512],
                          output_lengths: list[int] = [256, 512],
@@ -348,9 +335,7 @@ def integratedBenchmark (device_type: str="GPU",
     Args:
         bench: The benchmark instance to execute.
         batch_size: Number of sequences to process in parallel.
-        num_tokens: Total number of tokens to generate across the benchmark (not needed if num_iterations or num_request is used).
-        num_iterations: Total number of inference steps to run (not needed if num_tokens or num_request is used).
-        num_request: Total number of requests to the model (not needed if num_tokens or num_iterations is used).
+        num_iterations: Total number of batched propagations to run per configuration. Can be a number or list of numbers for each concurrency.
         dataset_type: Source of input data (e.g., "random", "sharegpt").
         input_length: Fixed length of the input prompt.
         output_length: Maximum tokens to generate per iteration.
@@ -395,13 +380,18 @@ def integratedBenchmark (device_type: str="GPU",
                         progress = round(test_configuration_count / total_test_configurations * 100, 1)
                         print(f"[vBench]   Running Benchmark... ({progress}% completed)\
                                            Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
+                        
+                        # Check for the number of iterations for the current configuration
+                        # Either a constant or specified for each batch size.
+                        if type(num_iterations) is list:
+                            iterations_for_this_batch = num_iterations[batch_sizes.index(batch_size)]
+                        else:
+                            iterations_for_this_batch = num_iterations
 
                         # Perform benchmark
                         results = singleBenchmark(bench, 
-                                                batch_size, 
-                                                num_tokens, 
-                                                num_iterations,
-                                                num_requests,
+                                                batch_size,
+                                                iterations_for_this_batch,
                                                 dataset_type, 
                                                 input_len, 
                                                 output_len, 

@@ -21,9 +21,7 @@ def main ():
     parser = argparse.ArgumentParser(description="LLM Benchmark Script For vLLM")
     parser.add_argument("--hf_token", type=str, required=True, help="Hugging Face token")
     parser.add_argument("--model", type=str, required=True, help="Model huggingface path, e.g., inceptionai/jais-13b-chat")
-    parser.add_argument("--num_tokens", type=int, default=1000, help="Total number of tokens to generate across the benchmark (not needed if num_iterations or num_request is used).")
-    parser.add_argument("--num_iterations", type=int, default=10, help="Total number of inference steps to run (not needed if num_tokens or num_request is used).")
-    parser.add_argument("--num_requests", type=int, default=10, help="Total number of requests to the model (not needed if num_tokens or num_iterations is used).")
+    parser.add_argument("--num_iterations", type=int, default=10, help="Total number of batched propagations to run per configuration.")
     parser.add_argument("--dataset", type=int, default=10, help="random or small-mixed")
     parser.add_argument("--warmup_runs", type=int, default=3, help="How many warmup iterations.")
     parser.add_argument("--max_output_len", type=int, default=256, help="Max tokens to generate per request.")
@@ -37,10 +35,8 @@ def main ():
     # Perform benchmark
     bench = BaseBench(args.model, args.hf_token)
     results = singleBenchmark(bench, 
-                              args.batch_size, 
-                              args.num_tokens,
+                              args.batch_size,
                               args.num_iterations,
-                              args.num_requests, 
                               args.dataset, 
                               args.max_input_len, 
                               args.max_output_len, 

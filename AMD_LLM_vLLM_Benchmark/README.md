@@ -58,7 +58,7 @@ python3 quick_bench.py \
 
 This method can either be imported via `from vbench import integratedBenchmark` or run the prepared orchestration script `broad_bench.py`. 
 
-All benchmark arguments, parameters and environment settings are located in the ``docker-compose.yml``, please adjust the section below to fit your needs (see below).
+All benchmark arguments, parameters and environment settings are located in the ``docker-compose.yml``, please adjust the section below to fit your needs (see below). **Note:** The parameters are always drawn from the yaml even if the benchmark is run barebone without docker.
 
 ```bash
 nano docker-compose.yml
@@ -80,10 +80,8 @@ nano docker-compose.yml
       input_lengths: [512, 1024]                                    # Input lengths to iterate over
       output_lengths: [512, 1024]                                   # Output lengths to iterate over
       dataset_type: random                                          # Dataset "random" or "small-mixed"
-      num_tokens: 10000                                             # Number of tokens to generate for 
-                                                                    # each configuration (not needed if num_iterations is used).
-      num_iterations: null                                          # Number of iterations or propagations per configuration
-                                                                    # (not needed if num_tokens is used).
+      num_iterations: [20, 5]                                       # Total number of batched propagations to run per configuration. 
+                                                                    # Can be a number or list of numbers for each concurrency.
       csv_path: "./amd_vllm_integrated_benchmark_results.csv"       # CSV output path
       warmup_runs: 5                                                # Warmup iterations before each configuration
     # =========================================================
@@ -101,7 +99,7 @@ The `broad_bench.py` will automatically source these arguments and create a whol
 #### Direct Python Execution
 ---
 
-The benchmark script can be executed in any prepared environment with a python interpreter (3.12 or later). Make sure that all necessary environment variables are set correctly. Optionally use the provided environment files
+First make sure to adjust the ``docker-compose.yaml`` with all benchmark parameters. The benchmark script can be executed in any prepared environment with a python interpreter (3.12 or later). Make sure that all necessary environment variables are set correctly. Optionally use the provided environment files
 
 ```bash
 # Option A: Use your custom environment variables 
