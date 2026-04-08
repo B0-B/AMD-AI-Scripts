@@ -1,6 +1,6 @@
 # AMD LLM Benchmark with vLLM
 
-The built-in benchmark shipped with the vLLM engine requires by design two separate servers - often separated in two containers, one for hosting the model and the other for running the benchmark and prompting against the end-point. This approach is not only impractical, but may introduce query latency and overhead due to the TCP route between the containers. 
+The built-in benchmark shipped with the vLLM engine requires two separate servers by design - often separated in two containers, one for hosting the model and another for running the benchmark and prompting against the end-point. This approach is not only impractical, but may introduce query latency and overhead due to the TCP route between the containers. 
 Instead, a simple customizable benchmark API can benchmark `CasualLM` models E2E on [vLLM](https://rocm.docs.amd.com/projects/radeon/en/latest/docs/advanced/vllm/vllm.html) within a single thread/container.
 
 ## vBench

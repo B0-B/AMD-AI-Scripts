@@ -20,7 +20,7 @@ from vllm.distributed.parallel_state import destroy_model_parallel
 # =============== Base Bench Object =================
 class BaseBench:
 
-    def __init__(self, hf_model: str, hf_token: str|None=None):
+    def __init__ (self, hf_model: str, hf_token: str|None=None):
         
         self.location = Path(__file__).resolve().parent
 
@@ -50,7 +50,7 @@ class BaseBench:
         # Small Mixed Dataset
         self.small_mixed_yaml_filename = "prompt_dataset__small_mixed.yml"
     
-    def cleanup(self):
+    def cleanup (self):
 
         """Cleanly shuts down the vLLM engine to free memory for the next model."""
         
@@ -373,10 +373,14 @@ def integratedBenchmark (device_type: str="GPU",
 
         # For every model we initialize a new bench object
         bench: BaseBench|None = None
-        bench = BaseBench(model, hf_token=hf_token)
-
-        # Load the dataset into it
-        bench.loadDataset(dataset_type)
+        try:
+            bench = BaseBench(model, hf_token=hf_token)
+            # Load the dataset into it
+            bench.loadDataset(dataset_type)
+        except:
+            print(f"[vBench]   Failed loading model {model}: {format_exc()}")
+            test_configuration_count += len(input_lengths) * len(output_lengths) * len(batch_sizes)
+            continue
 
         # Test all configurations
         for input_len in input_lengths:
@@ -390,7 +394,7 @@ def integratedBenchmark (device_type: str="GPU",
                         # Print progress
                         progress = round(test_configuration_count / total_test_configurations * 100, 1)
                         print(f"[vBench]   Running Benchmark... ({progress}% completed)\
-                                        Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
+                                           Model: {model}  Batch_Size: {batch_size}  Input_len: {input_len}  Ouput_len: {output_len}")
 
                         # Perform benchmark
                         results = singleBenchmark(bench, 
