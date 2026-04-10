@@ -36,7 +36,8 @@ class BaseBench:
             download_dir=None,
             hf_token=hf_token,
             disable_log_stats = False, # enable metrics collection
-            enforce_eager=True 
+            enforce_eager=True,
+            generation_config="vllm"
         )
 
         self.tokenizer = self.llm.get_tokenizer()
