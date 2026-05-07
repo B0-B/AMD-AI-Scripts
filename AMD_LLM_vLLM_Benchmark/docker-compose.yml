@@ -26,6 +26,7 @@ services:
       concurrencies: [1, 4, 16, 64]
       input_lengths: [512, 1024]
       output_lengths: [512, 1024]
+      max_model_length: 4096
       dataset_type: random
       num_iterations: 10
       csv_path: "./results/amd_vllm_integrated_benchmark_results.csv"

@@ -20,7 +20,7 @@ from vllm.distributed.parallel_state import destroy_model_parallel
 # =============== Base Bench Object =================
 class BaseBench:
 
-    def __init__ (self, hf_model: str, hf_token: str|None=None):
+    def __init__ (self, hf_model: str, hf_token: str|None=None, max_model_len: int=-1):
         
         self.location = Path(__file__).resolve().parent
 
@@ -37,7 +37,8 @@ class BaseBench:
             hf_token=hf_token,
             disable_log_stats = False, # enable metrics collection
             enforce_eager=True,
-            generation_config="vllm"
+            generation_config="vllm",
+            max_model_len=max_model_len
         )
 
         self.tokenizer = self.llm.get_tokenizer()
@@ -314,6 +315,7 @@ def singleBenchmark (bench: BaseBench,
 def integratedBenchmark (device_type: str="GPU",
                          device: str="n/a",
                          hf_models: list[str]=["inceptionai/jais-13b-chat"],
+                         max_model_len: int|list[int] = -1,
                          hf_token: str|None=None,
                          batch_sizes: list[int]=[1,4,8,16,32,64,128],
                          num_iterations: int|list[int]=5,
@@ -355,19 +357,28 @@ def integratedBenchmark (device_type: str="GPU",
     test_configuration_count = 0
     total_test_configurations = len(hf_models) * len(input_lengths) * len(output_lengths) * len(batch_sizes)
 
-    for model in hf_models:
+    for m in range(len(hf_models)):
+
+        model = hf_models[m]
+
+        # Pick the correct model length if list was provided for each model
+        current_model_length = -1
+        if type(max_model_len) is list:
+            current_model_length = max_model_len[m]
+        elif type(max_model_len) is int and max_model_len > 0:
+            current_model_length = max_model_len
 
         # For every model we initialize a new bench object
         bench: BaseBench|None = None
         try:
-            bench = BaseBench(model, hf_token=hf_token)
+            bench = BaseBench(model, hf_token, current_model_length)
             # Load the dataset into it
             bench.loadDataset(dataset_type)
         except:
             print(f"[vBench]   Failed loading model {model}: {format_exc()}")
             test_configuration_count += len(input_lengths) * len(output_lengths) * len(batch_sizes)
             continue
-
+        
         # Test all configurations
         for input_len in input_lengths:
 
@@ -388,7 +399,7 @@ def integratedBenchmark (device_type: str="GPU",
                             iterations_for_this_batch = num_iterations[batch_sizes.index(batch_size)]
                         else:
                             iterations_for_this_batch = num_iterations
-
+                    
                         # Perform benchmark
                         results = singleBenchmark(bench, 
                                                 batch_size,

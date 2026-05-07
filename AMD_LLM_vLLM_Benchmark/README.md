@@ -79,9 +79,15 @@ nano docker-compose.yml
       concurrencies: [1, 4]                                         # Number of parallel requests per iteration
       input_lengths: [512, 1024]                                    # Input lengths to iterate over
       output_lengths: [512, 1024]                                   # Output lengths to iterate over
+      max_model_length: [-1, 4096]                                  # Total model length, should be larger than 
+                                                                    # max_input_len + max_output_len, default is -1 for
+                                                                    # auto settings from config. Use array to set length 
+                                                                    # for each model. Otherwise, single values will be applied to 
+                                                                    # all models.
       dataset_type: random                                          # Dataset "random" or "small-mixed"
-      num_iterations: [20, 5]                                       # Total number of batched propagations to run per configuration. 
-                                                                    # Can be a number or list of numbers for each concurrency.
+      num_iterations: [20, 5]                                       # Total number of batched propagations to run 
+                                                                    # per configuration. Can be a number
+                                                                    # or list of numbers for each concurrency.
       csv_path: "./amd_vllm_integrated_benchmark_results.csv"       # CSV output path
       warmup_runs: 5                                                # Warmup iterations before each configuration
     # =========================================================

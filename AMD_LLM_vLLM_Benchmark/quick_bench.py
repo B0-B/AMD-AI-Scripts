@@ -21,6 +21,7 @@ def main ():
     parser = argparse.ArgumentParser(description="LLM Benchmark Script For vLLM")
     parser.add_argument("--hf_token", type=str, required=True, help="Hugging Face token")
     parser.add_argument("--model", type=str, required=True, help="Model huggingface path, e.g., inceptionai/jais-13b-chat")
+    parser.add_argument("--max_model_len", type=int, default=-1, help="Max model len, default -1 for auto detect from model config. Should be larger than max_input_len + max_output_len")
     parser.add_argument("--num_iterations", type=int, default=10, help="Total number of batched propagations to run per configuration.")
     parser.add_argument("--dataset", type=int, default=10, help="random or small-mixed")
     parser.add_argument("--warmup_runs", type=int, default=3, help="How many warmup iterations.")
@@ -33,7 +34,7 @@ def main ():
     args = parser.parse_args()
 
     # Perform benchmark
-    bench = BaseBench(args.model, args.hf_token)
+    bench = BaseBench(args.model, args.hf_token, args.max_model_len)
     results = singleBenchmark(bench, 
                               args.batch_size,
                               args.num_iterations,
