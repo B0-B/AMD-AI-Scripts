@@ -45,6 +45,7 @@ if __name__ == '__main__':
         device_name     = bargs['device_name']
         dataset_type    = bargs['dataset_type']
         hf_models       = bargs['models'] 
+        hf_model_variants = bargs['model_variants'] 
         max_model_len   = bargs['max_model_length']
         hf_token        = bargs['hf_token']  
         concurrencies   = bargs['concurrencies']   
@@ -67,6 +68,7 @@ if __name__ == '__main__':
     integratedBenchmark(device_type,
                         device_name,
                         hf_models, 
+                        hf_model_variants,
                         max_model_len,
                         hf_token, 
                         concurrencies, 

@@ -73,17 +73,21 @@ nano docker-compose.yml
       models:                                                       # Define the list of models to test
         - "amd/Llama-3.1-8B-Instruct-FP8-KV"
         - "inceptionai/jais-13b-chat"
+      model_variants:                                               # Define a variant specification for each model
+        - "8B-FP8"
+        - "13B"
+      max_model_length: [-1, 4096]                                  # Total model length, should be larger than 
+                                                                    # max_input_len + max_output_len, default is -1 for
+                                                                    # auto settings from config. Use array to set length 
+                                                                    # for each model or a single value which will be applied to 
+                                                                    # all models.
       hf_token: "<hf_token_here>"                                   # Provide huggingface token
       device_type: GPU                                              # Which device type GPU or CPU
       device_name: MI300X                                           # Device name
       concurrencies: [1, 4]                                         # Number of parallel requests per iteration
       input_lengths: [512, 1024]                                    # Input lengths to iterate over
       output_lengths: [512, 1024]                                   # Output lengths to iterate over
-      max_model_length: [-1, 4096]                                  # Total model length, should be larger than 
-                                                                    # max_input_len + max_output_len, default is -1 for
-                                                                    # auto settings from config. Use array to set length 
-                                                                    # for each model. Otherwise, single values will be applied to 
-                                                                    # all models.
+      
       dataset_type: random                                          # Dataset "random" or "small-mixed"
       num_iterations: [20, 5]                                       # Total number of batched propagations to run 
                                                                     # per configuration. Can be a number

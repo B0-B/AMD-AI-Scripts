@@ -20,7 +20,7 @@ from vllm.distributed.parallel_state import destroy_model_parallel
 # =============== Base Bench Object =================
 class BaseBench:
 
-    def __init__ (self, hf_model: str, hf_token: str|None=None, max_model_len: int=-1):
+    def __init__ (self, hf_model: str, hf_token: str|None=None, model_variant: str="vanilla", max_model_len: int=-1):
         
         self.location = Path(__file__).resolve().parent
 
@@ -28,6 +28,7 @@ class BaseBench:
             login(token=hf_token)
 
         self.hf_model = hf_model
+        self.model_variant = model_variant
         self.llm = LLM(
             model=hf_model,
             tokenizer=hf_model,
@@ -288,6 +289,7 @@ def singleBenchmark (bench: BaseBench,
     # Collect results
     benchmark_results = {
         "model": bench.hf_model,
+        "model_variant": bench.model_variant,
         f"{device_type}": device,
         "max_input_length": input_length,
         "max_output_length": output_length,
@@ -315,6 +317,7 @@ def singleBenchmark (bench: BaseBench,
 def integratedBenchmark (device_type: str="GPU",
                          device: str="n/a",
                          hf_models: list[str]=["inceptionai/jais-13b-chat"],
+                         hf_model_variants: list[str]=["13b"],
                          max_model_len: int|list[int] = -1,
                          hf_token: str|None=None,
                          batch_sizes: list[int]=[1,4,8,16,32,64,128],
@@ -360,6 +363,7 @@ def integratedBenchmark (device_type: str="GPU",
     for m in range(len(hf_models)):
 
         model = hf_models[m]
+        variant = hf_model_variants[m]
 
         # Pick the correct model length if list was provided for each model
         current_model_length = -1
@@ -371,7 +375,7 @@ def integratedBenchmark (device_type: str="GPU",
         # For every model we initialize a new bench object
         bench: BaseBench|None = None
         try:
-            bench = BaseBench(model, hf_token, current_model_length)
+            bench = BaseBench(model, hf_token, variant, current_model_length)
             # Load the dataset into it
             bench.loadDataset(dataset_type)
         except:
@@ -426,7 +430,7 @@ def integratedBenchmark (device_type: str="GPU",
                         # Increment the number of tested configurations
                         test_configuration_count += 1
 
-        # Check if bench was actually created AND is not None
+        # Check if bench was actually created
         if bench is not None:
             print("[vBench]   Cleanup bench object ...")
             try:
