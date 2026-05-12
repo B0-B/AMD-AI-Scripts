@@ -34,7 +34,7 @@ def main ():
     args = parser.parse_args()
 
     # Perform benchmark
-    bench = BaseBench(args.model, args.hf_token, args.max_model_len)
+    bench = BaseBench(args.model, args.hf_token, "n/a", args.max_model_len)
     results = singleBenchmark(bench, 
                               args.batch_size,
                               args.num_iterations,
