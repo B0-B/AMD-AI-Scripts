@@ -54,3 +54,6 @@ def main ():
     
     except Exception:
         print_exc()
+
+if __name__ == '__main__':
+    main()
