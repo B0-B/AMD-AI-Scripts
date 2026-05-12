@@ -460,7 +460,6 @@ def show (results: dict[str, int|float|str]) -> None:
     print('-------- Benchmark Details --------')
     print('GPU Device Name:                  ', torch.cuda.get_device_name(0))
     print('HF Model Path:                    ', results['model'])
-    print('Warmup Iterations:                ', results['warmups'])
     print('Max. Input Tokens:                ', results['max_input_length'])
     print('Max. Output Tokens:               ', results['max_output_length'])
     print('Batch Size - Concurrency:         ', results['concurrency'])
