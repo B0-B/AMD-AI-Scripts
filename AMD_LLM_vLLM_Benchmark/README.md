@@ -41,15 +41,19 @@ Run a single quick benchmark with fixed parameters. Use the CLI to tailor the be
 
 ```bash
 python3 quick_bench.py \
+    --device_type GPU \
     --hf_token hf_xxxx \
     --model inceptionai/jais-13b-chat \
-    --num_tokens 10000 \
+    --num_iterations 10 \
     --max_output_len 1024 \
     --max_input_len 512 \
     --dataset random \
     --temperature 0.1 \
-    --batch_size 1
+    --batch_size 1 \
+    --warmup_runs 3
 ```
+
+to see all options and parameters simply call `python3 quick_bench.py --help`.
 
 <br>
 
