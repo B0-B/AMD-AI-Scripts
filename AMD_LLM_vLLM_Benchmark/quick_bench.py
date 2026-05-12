@@ -26,7 +26,7 @@ def main ():
         parser.add_argument("--model", type=str, required=True, help="Model huggingface path, e.g., inceptionai/jais-13b-chat")
         parser.add_argument("--max_model_len", type=int, default=-1, help="Max model len, default -1 for auto detect from model config. Should be larger than max_input_len + max_output_len")
         parser.add_argument("--num_iterations", type=int, default=10, help="Total number of batched propagations to run per configuration.")
-        parser.add_argument("--dataset", type=int, default=10, help="random or small-mixed")
+        parser.add_argument("--dataset", type=str, default="random", help="'random' or 'small-mixed'")
         parser.add_argument("--warmup_runs", type=int, default=3, help="How many warmup iterations.")
         parser.add_argument("--max_output_len", type=int, default=256, help="Max tokens to generate per request.")
         parser.add_argument("--max_input_len", type=int, default=256, help="Max tokens to input per request. Note: this parameter only works with random dataset.")
